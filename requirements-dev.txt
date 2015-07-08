@@ -1,0 +1,8 @@
+.
+flake8
+pytest
+coverage
+sphinx
+alabaster>=0.6.2
+pep257
+
