@@ -55,7 +55,7 @@ class TestCookiesIdentity(unittest.TestCase):
 
         port = self.find_unused_port()
         self.handler = app.make_handler(
-            debug=True, keep_alive_on=False)
+            debug=False, keep_alive_on=False)
         srv = yield from self.loop.create_server(
             self.handler, '127.0.0.1', port)
         url = "http://127.0.0.1:{}".format(port)
