@@ -2,6 +2,29 @@ import codecs
 from setuptools import setup, find_packages
 import os
 import re
+import sys
+
+from setuptools.command.test import test as TestCommand
+
+
+class PyTest(TestCommand):
+    user_options = [('pytest-args=', 'a', "Arguments to pass to py.test")]
+
+    def initialize_options(self):
+        TestCommand.initialize_options(self)
+        self.pytest_args = []
+
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = []
+        self.test_suite = True
+
+    def run_tests(self):
+        # import here, cause outside the eggs aren't loaded
+        import pytest
+        errno = pytest.main(self.pytest_args)
+        sys.exit(errno)
+
 
 
 with codecs.open(os.path.join(os.path.abspath(os.path.dirname(
@@ -16,7 +39,7 @@ def read(f):
     return open(os.path.join(os.path.dirname(__file__), f)).read().strip()
 
 install_requires = ['aiohttp>=0.14']
-tests_require = install_requires + ['nose']
+tests_require = install_requires + ['pytest']
 extras_require = {}
 
 setup(name='aiohttp_security',
@@ -38,6 +61,6 @@ setup(name='aiohttp_security',
       packages=find_packages(),
       install_requires=install_requires,
       tests_require=tests_require,
-      test_suite='nose.collector',
+      cmdclass={'test': PyTest},
       include_package_data=True,
       extras_require=extras_require)
