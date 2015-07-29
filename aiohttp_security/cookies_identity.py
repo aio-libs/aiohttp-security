@@ -22,7 +22,8 @@ class CookiesIdentityPolicy(AbstractIdentityPolicy):
                  **kwargs):
         if max_age is sentinel:
             max_age = self._max_age
-        response.set_cookie(self._cookie_name, max_age=max_age, **kwargs)
+        response.set_cookie(self._cookie_name, identity,
+                            max_age=max_age, **kwargs)
 
     @asyncio.coroutine
     def forget(self, request, response):

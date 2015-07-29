@@ -61,8 +61,7 @@ class TestCookiesIdentity(unittest.TestCase):
         @asyncio.coroutine
         def handler(request):
             response = web.Response()
-            hdrs = yield from remember(request, 'Andrew')
-            response.headers.extend(hdrs)
+            yield from remember(request, response, 'Andrew')
             return response
 
         @asyncio.coroutine
@@ -82,8 +81,7 @@ class TestCookiesIdentity(unittest.TestCase):
         @asyncio.coroutine
         def create(request):
             response = web.Response()
-            hdrs = yield from remember(request, 'Andrew')
-            response.headers.extend(hdrs)
+            yield from remember(request, response, 'Andrew')
             return response
 
         @asyncio.coroutine
@@ -116,15 +114,13 @@ class TestCookiesIdentity(unittest.TestCase):
         @asyncio.coroutine
         def login(request):
             response = web.HTTPFound(location='/')
-            hdrs = yield from remember(request, 'Andrew')
-            response.headers.extend(hdrs)
+            yield from remember(request, response, 'Andrew')
             return response
 
         @asyncio.coroutine
         def logout(request):
             response = web.HTTPFound(location='/')
-            hdrs = yield from forget(request)
-            response.headers.extend(hdrs)
+            yield from forget(request, response)
             return response
 
         @asyncio.coroutine
