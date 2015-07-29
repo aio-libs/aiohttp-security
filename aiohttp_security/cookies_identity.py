@@ -6,6 +6,9 @@ from aiohttp import hdrs, CIMultiDict
 from .abc import AbstractIdentityPolicy
 
 
+sentinel = object()
+
+
 class CookiesIdentityPolicy(AbstractIdentityPolicy):
 
     def __init__(self):
@@ -18,23 +21,12 @@ class CookiesIdentityPolicy(AbstractIdentityPolicy):
         return identity
 
     @asyncio.coroutine
-    def remember(self, request, identity, **kwargs):
-        cookies = http.cookies.SimpleCookie()
-        max_age = kwargs.pop('max_age', self._max_age)
-        cookies[self._cookie_name] = identity
-        cookie = cookies[self._cookie_name]
-        cookie['max-age'] = max_age
-        cookie.update(kwargs)
-
-        value = cookie.output(header='')[1:]
-        result = CIMultiDict({hdrs.SET_COOKIE: value})
-        return result
+    def remember(self, request, response, identity, max_age=sentinel,
+                 **kwargs):
+        if max_age is sentinel:
+            max_age = self._max_age
+        response.set_cookie(self._cookie_name, max_age=max_age, **kwargs)
 
     @asyncio.coroutine
-    def forget(self, request):
-        cookies = http.cookies.SimpleCookie()
-        cookies[self._cookie_name] = ''
-        cookie = cookies[self._cookie_name]
-        value = cookie.output(header='')[1:]
-        result = CIMultiDict({hdrs.SET_COOKIE: value})
-        return result
+    def forget(self, request, response):
+        response.del_cookie(self._cookie_name)

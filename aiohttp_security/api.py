@@ -7,17 +7,15 @@ AUTZ_KEY = 'aiohttp_security_autz_policy'
 
 
 @asyncio.coroutine
-def remember(request, identity, **kwargs):
+def remember(request, response, identity, **kwargs):
     identity_policy = request.app[IDENTITY_KEY]
-    headers = yield from identity_policy.remember(request, identity, **kwargs)
-    return headers
+    yield from identity_policy.remember(request, response, identity, **kwargs)
 
 
 @asyncio.coroutine
-def forget(request):
+def forget(request, response):
     identity_policy = request.app[IDENTITY_KEY]
-    headers = yield from identity_policy.forget(request)
-    return headers
+    yield from identity_policy.forget(request, response)
 
 
 @asyncio.coroutine

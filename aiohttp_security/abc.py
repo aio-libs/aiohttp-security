@@ -9,16 +9,16 @@ class AbstractIdentityPolicy(metaclass=abc.ABCMeta):
     @asyncio.coroutine
     @abc.abstractmethod
     def identify(self, request):
-        """ Return the claimed identity of the user associated request or
+        """Return the claimed identity of the user associated request or
         ``None`` if no identity can be found associated with the request."""
         pass
 
     @asyncio.coroutine
     @abc.abstractmethod
-    def remember(self, request, identity, **kwargs):
+    def remember(self, request, response, identity, **kwargs):
         """Remember identity.
 
-        Return MultiDict with headers on this request's response.
+        Modify response object by filling it's headers with remembered user.
 
         An individual identity policy and its consumers can decide on
         the composition and meaning of **kw.
@@ -27,8 +27,8 @@ class AbstractIdentityPolicy(metaclass=abc.ABCMeta):
 
     @asyncio.coroutine
     @abc.abstractmethod
-    def forget(self, request):
-        """ Modify request.response which can be used to 'forget' the
+    def forget(self, request, response):
+        """ Modify response which can be used to 'forget' the
         current identity on subsequent requests."""
         pass
 
