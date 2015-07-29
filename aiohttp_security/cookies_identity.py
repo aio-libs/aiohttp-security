@@ -1,7 +1,4 @@
 import asyncio
-import http.cookies
-
-from aiohttp import hdrs, CIMultiDict
 
 from .abc import AbstractIdentityPolicy
 
