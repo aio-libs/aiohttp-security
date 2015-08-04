@@ -20,8 +20,10 @@ def forget(request, response):
 
 @asyncio.coroutine
 def authorized_userid(request):
-    identity_policy = request.app[IDENTITY_KEY]
-    autz_policy = request.app[AUTZ_KEY]
+    identity_policy = request.app.get(IDENTITY_KEY)
+    autz_policy = request.app.get(AUTZ_KEY)
+    if identity_policy is None or autz_policy is None:
+        return None
     identity = yield from identity_policy.identify(request)
     user_id = yield from autz_policy.authorized_userid(identity)
     return user_id
@@ -29,8 +31,10 @@ def authorized_userid(request):
 
 @asyncio.coroutine
 def permits(request, permission, context=None):
-    identity_policy = request.app[IDENTITY_KEY]
-    autz_policy = request.app[AUTZ_KEY]
+    identity_policy = request.app.get(IDENTITY_KEY)
+    autz_policy = request.app.get(AUTZ_KEY)
+    if identity_policy is None or autz_policy is None:
+        return True
     identity = yield from identity_policy.identify(request)
     access = yield from autz_policy.permits(identity, permission, context)
     return access
