@@ -1,4 +1,5 @@
 import asyncio
+from aiohttp import web
 from aiohttp_security.abc import (AbstractIdentityPolicy,
                                   AbstractAuthorizationPolicy)
 
@@ -8,13 +9,27 @@ AUTZ_KEY = 'aiohttp_security_autz_policy'
 
 @asyncio.coroutine
 def remember(request, response, identity, **kwargs):
-    identity_policy = request.app[IDENTITY_KEY]
+    identity_policy = request.app.get(IDENTITY_KEY)
+    if identity_policy is None:
+        text = ("Security subsystem is not initialized, "
+                "call aiohttp_security.setup(...) first")
+        # in order to see meaningful exception message both: on console
+        # output and rendered page we add same message to *reason* and
+        # *text* arguments.
+        raise web.HTTPInternalServerError(reason=text, text=text)
     yield from identity_policy.remember(request, response, identity, **kwargs)
 
 
 @asyncio.coroutine
 def forget(request, response):
-    identity_policy = request.app[IDENTITY_KEY]
+    identity_policy = request.app.get(IDENTITY_KEY)
+    if identity_policy is None:
+        text = ("Security subsystem is not initialized, "
+                "call aiohttp_security.setup(...) first")
+        # in order to see meaningful exception message both: on console
+        # output and rendered page we add same message to *reason* and
+        # *text* arguments.
+        raise web.HTTPInternalServerError(reason=text, text=text)
     yield from identity_policy.forget(request, response)
 
 
