@@ -27,7 +27,7 @@ clean:
 	rm -rf coverage
 	rm -rf build
 	rm -rf cover
-	# make -C docs clean
+	make -C docs clean
 	python setup.py clean
 
 doc:
