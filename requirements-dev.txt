@@ -1,6 +1,7 @@
 -e .
 flake8
 pytest
+pytest-cov
 coverage
 sphinx
 alabaster>=0.6.2

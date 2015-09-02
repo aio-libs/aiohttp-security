@@ -1,23 +1,17 @@
 # Some simple testing tasks (sorry, UNIX only).
 
-FLAGS=
-
-
 flake:
 	flake8 aiohttp_security tests 
 
 
 test: flake
-	py.test -s $(FLAGS) ./tests/
+	py.test -s -q ./tests/
 
-vtest: flake develop
-	py.test -s -v $(FLAGS) ./tests/
+vtest: flake
+	py.test -s ./tests/
 
 cov cover coverage: flake
-	@coverage erase
-	@coverage run -m py.test -s $(FLAGS) tests
-	@coverage report
-	@coverage html
+	py.test -s ./tests/ --cov=aiohttp_security --cov=tests --cov-report=html --cov-report=term
 	@echo "open file://`pwd`/coverage/index.html"
 
 clean:
