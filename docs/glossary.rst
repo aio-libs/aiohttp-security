@@ -9,8 +9,18 @@
 .. glossary::
 
 
-   session
+   aiohttp
 
-      A namespace that is valid for some period of continual activity
-      that can be used to represent a user's interaction with a web
-      application.
+      :term:`asyncio` based library for making web servers.
+
+
+   asyncio
+
+      The library for writing single-threaded concurrent code using
+      coroutines, multiplexing I/O access over sockets and other
+      resources, running network clients and servers, and other
+      related primitives.
+
+      Reference implementation of :pep:`3156`
+
+      https://pypi.python.org/pypi/asyncio/

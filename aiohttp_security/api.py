@@ -55,9 +55,9 @@ def permits(request, permission, context=None):
     return access
 
 
-def setup(app, identity_policy, auth_policy):
+def setup(app, identity_policy, autz_policy):
     assert isinstance(identity_policy, AbstractIdentityPolicy), identity_policy
-    assert isinstance(auth_policy, AbstractAuthorizationPolicy), auth_policy
+    assert isinstance(autz_policy, AbstractAuthorizationPolicy), autz_policy
 
     app[IDENTITY_KEY] = identity_policy
-    app[AUTZ_KEY] = auth_policy
+    app[AUTZ_KEY] = autz_policy
