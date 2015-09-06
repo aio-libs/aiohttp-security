@@ -26,7 +26,6 @@ class PyTest(TestCommand):
         sys.exit(errno)
 
 
-
 with codecs.open(os.path.join(os.path.abspath(os.path.dirname(
         __file__)), 'aiohttp_security', '__init__.py'), 'r', 'latin1') as fp:
     try:
