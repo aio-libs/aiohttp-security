@@ -28,6 +28,8 @@ def remember(request, response, identity, **kwargs):
 
 @asyncio.coroutine
 def forget(request, response):
+    """Forget previously remembered identity."""
+
     identity_policy = request.app.get(IDENTITY_KEY)
     if identity_policy is None:
         text = ("Security subsystem is not initialized, "
