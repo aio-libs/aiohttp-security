@@ -11,8 +11,10 @@ AUTZ_KEY = 'aiohttp_security_autz_policy'
 def remember(request, response, identity, **kwargs):
     """Remember identity into response.
 
-    The action is performed by indentity_policy.remember()
-    Usually the idenity is stored in user cookies homehow.
+    The action is performed by identity_policy.remember()
+
+    Usually the idenity is stored in user cookies homehow but may be
+    pushed into custom header also.
     """
     assert isinstance(identity, str), identity
     identity_policy = request.app.get(IDENTITY_KEY)
@@ -28,8 +30,11 @@ def remember(request, response, identity, **kwargs):
 
 @asyncio.coroutine
 def forget(request, response):
-    """Forget previously remembered identity."""
+    """Forget previously remembered identity.
 
+    Usually it clears cookie or server-side storage to forget user
+    session.
+    """
     identity_policy = request.app.get(IDENTITY_KEY)
     if identity_policy is None:
         text = ("Security subsystem is not initialized, "
