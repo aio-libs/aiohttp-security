@@ -31,8 +31,8 @@
 
       Stored in local storage (client-side cookie or server-side storage).
 
-      Use :coroutine:`~aiohttp_session.remember` for saving *identity* (login)
-      and :coroutine:`~aiohttp_session.forget` for dropping it (logout).
+      Use :coroutine:`~aiohttp_session.remember` for saving *identity* (sign in)
+      and :coroutine:`~aiohttp_session.forget` for dropping it (sign out).
 
       *identity* is used for getting :term:`userid` and :term:`permissions`.
 

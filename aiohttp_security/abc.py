@@ -21,7 +21,7 @@ class AbstractIdentityPolicy(metaclass=abc.ABCMeta):
         Modify response object by filling it's headers with remembered user.
 
         An individual identity policy and its consumers can decide on
-        the composition and meaning of **kw.
+        the composition and meaning of **kwargs.
         """
         pass
 
