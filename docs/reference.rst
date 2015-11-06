@@ -13,16 +13,16 @@
 Public API functions
 ====================
 
-.. coroutine:: remember(request, response, identity, **kwargs)
+.. coroutinefunction:: remember(request, response, identity, **kwargs)
 
    Remember *identity* in *response*, e.g. by storing a cookie or
    saving info into session.
 
    The action is performed by registered
-   :coroutinemethod:`AbstractIdentityPolicy.remember`.
+   :meth:`AbstractIdentityPolicy.remember`.
 
    Usually the *idenity* is stored in user cookies homehow for using by
-   :coroutine:`authorized_userid` and :coroutine:`permits`.
+   :func:`authorized_userid` and :func:`permits`.
 
    :param request: :class:`aiohttp.web.Request` object.
 
@@ -31,18 +31,18 @@ Public API functions
 
    :param str identity: :class:`aiohttp.web.Request` object.
 
-   :param **kwargs: additional arguments passed to
-                    :coroutinemethod:`AbstractIdentityPolicy.remember`.
+   :param kwargs: additional arguments passed to
+                  :meth:`AbstractIdentityPolicy.remember`.
 
-                    They are policy-specific and may be used, e.g. for
-                    specifiying cookie lifetime.
+                  They are policy-specific and may be used, e.g. for
+                  specifiying cookie lifetime.
 
-.. coroutine:: forget(request, response)
+.. coroutinefunction:: forget(request, response)
 
    Forget previously remembered :term:`identity`.
 
    The action is performed by registered
-   :coroutinemethod:`AbstractIdentityPolicy.forget`.
+   :meth:`AbstractIdentityPolicy.forget`.
 
    :param request: :class:`aiohttp.web.Request` object.
 
@@ -50,11 +50,11 @@ Public API functions
                     descendants like :class:`aiohttp.web.Response`.
 
 
-.. coroutine:: authorized_userid(request)
+.. coroutinefunction:: authorized_userid(request)
 
    Retrieve :term:`userid`.
 
-   The user should be registered by :coroutine:`remember` before the call.
+   The user should be registered by :func:`remember` before the call.
 
    :param request: :class:`aiohttp.web.Request` object.
 
@@ -62,7 +62,7 @@ Public API functions
             without signed in user.
 
 
-.. coroutine:: permits(request, permission, context=None)
+.. coroutinefunction:: permits(request, permission, context=None)
 
    Check user's permission.
 
@@ -74,7 +74,7 @@ Public API functions
    Actually it's a wrapper around
    :meth:`AbstractAuthorizationPolicy.permits` coroutine.
 
-   The user should be registered by :coroutine:`remember` before the call.
+   The user should be registered by :func:`remember` before the call.
 
    :param request: :class:`aiohttp.web.Request` object.
 
@@ -177,3 +177,32 @@ Identification policy
 
       :param response: :class:`aiohttp.web.StreamResponse` object or
                        derivative.
+
+
+Authorization policy
+---------------------
+
+.. class:: AbstractAuthorizationPolicy
+
+   .. coroutinemethod:: authorized_userid(identity)
+
+      Retrieve authorized user id.
+
+      Abstract method, should be overriden by descendant.
+
+      :param identity: an :term:`identity` used for authorization.
+
+      :return: the :term:`userid` of the user identified by the
+               *identity* or ``None`` if no user exists related to the
+               identity.
+
+   .. coroutinemethod:: permits(identity, permission, context=None)
+
+      Check user permissions.
+
+      Abstract method, should be overriden by descendant.
+
+      :param identity: an :term:`identity` used for authorization.
+
+      :param permission: requested permission. The type of parameter
+                         is not fixed and depends on implementation.

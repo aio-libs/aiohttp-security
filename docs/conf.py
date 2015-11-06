@@ -39,6 +39,7 @@ with codecs.open(_version_path, 'r', 'latin1') as fp:
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath('.'))
 
 import alabaster
 
@@ -54,6 +55,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.viewcode',
     'alabaster',
+    'aiohttp_doctools',
 ]
 
 # Add any paths that contain templates here, relative to this directory.

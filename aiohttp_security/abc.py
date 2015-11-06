@@ -38,13 +38,19 @@ class AbstractAuthorizationPolicy(metaclass=abc.ABCMeta):
     @asyncio.coroutine
     @abc.abstractmethod
     def permits(self, identity, permission, context=None):
-        """ Return True if the identity is allowed the permission in the
-        current context, else return False"""
+        """Check user permissions.
+
+        Return True if the identity is allowed the permission in the
+        current context, else return False.
+        """
         pass
 
     @asyncio.coroutine
     @abc.abstractmethod
     def authorized_userid(self, identity):
-        """ Return the user_id of the user identified by the identity
-        or 'None' if no user exists related to the identity """
+        """Retrieve authorized user id.
+
+        Return the user_id of the user identified by the identity
+        or 'None' if no user exists related to the identity.
+        """
         pass
