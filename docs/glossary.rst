@@ -47,6 +47,13 @@
 
       *identity* is used for getting :term:`userid` and :term:`permissions`.
 
+   permission
+
+      Permission required for access to resource.
+
+      Permissions are just strings, and they have no required
+      composition: you can name permissions whatever you like.
+
    userid
 
        User's ID, most likely his *login* or *email*
