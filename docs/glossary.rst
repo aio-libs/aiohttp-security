@@ -25,6 +25,17 @@
 
       https://pypi.python.org/pypi/asyncio/
 
+   authentication
+
+      Actions related to retrieving, storing and removing user's
+      :term:`identity`.
+
+      Authenticated user has no access rights, the system even has no
+      knowledge is there the user still registered in DB.
+
+      If :term:`request` has an :term:`identity` it means the user has
+      some ID that should be checked by :term:`authorization` policy.
+
    identity
 
       Session-wide :class:`str` for identifying user.

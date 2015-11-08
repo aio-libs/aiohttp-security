@@ -78,10 +78,7 @@ Public API functions
 
    :param request: :class:`aiohttp.web.Request` object.
 
-   :param permission: requested permission. May be :class:`str` or
-                      more complex object -- see used
-                      :class:`AbstractAuthorizationPolicy`
-                      implementation.
+   :param str permission: requested permission.
 
    :param context: additional object may be passed into
                    :meth:`AbstractAuthorizationPolicy.permission`
