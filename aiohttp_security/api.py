@@ -59,6 +59,7 @@ def authorized_userid(request):
 
 @asyncio.coroutine
 def permits(request, permission, context=None):
+    assert isinstance(permission, str), permission
     identity_policy = request.app.get(IDENTITY_KEY)
     autz_policy = request.app.get(AUTZ_KEY)
     if identity_policy is None or autz_policy is None:
