@@ -33,8 +33,14 @@
       Authenticated user has no access rights, the system even has no
       knowledge is there the user still registered in DB.
 
-      If :term:`request` has an :term:`identity` it means the user has
-      some ID that should be checked by :term:`authorization` policy.
+      If :class:`~aiohttp.web.Request` has an :term:`identity` it
+      means the user has some ID that should be checked by
+      :term:`authorization` policy.
+
+   authorization
+
+      Checking actual permissions for identified user along with
+      getting :term:`userid`.
 
    identity
 
@@ -42,10 +48,10 @@
 
       Stored in local storage (client-side cookie or server-side storage).
 
-      Use :coroutine:`~aiohttp_session.remember` for saving *identity* (sign in)
-      and :coroutine:`~aiohttp_session.forget` for dropping it (sign out).
+      Use :meth:`~aiohttp_session.remember` for saving *identity* (sign in)
+      and :meth:`~aiohttp_session.forget` for dropping it (sign out).
 
-      *identity* is used for getting :term:`userid` and :term:`permissions`.
+      *identity* is used for getting :term:`userid` and :term:`permission`.
 
    permission
 

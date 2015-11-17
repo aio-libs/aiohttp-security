@@ -19,7 +19,7 @@ Contents:
 
    usage
    reference
-   examples
+   example
    glossary
 
 
