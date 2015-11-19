@@ -68,6 +68,10 @@ class Client:
             url += '/'
         self._url = url
 
+    @property
+    def cookies(self):
+        return self._session.cookies
+
     def close(self):
         self._session.close()
 
