@@ -1,3 +1,10 @@
+"""Identity polocy for storing info directly into HTTP cookie.
+
+Use mostly for demonstration purposes, SessionIdentityPolicy is much
+more handy.
+
+"""
+
 import asyncio
 
 from .abc import AbstractIdentityPolicy

@@ -29,7 +29,7 @@ def read(f):
 
 install_requires = ['aiohttp>=0.18']
 tests_require = install_requires + ['pytest']
-extras_require = {}
+extras_require = {'session': 'aiohttp_session'}
 
 setup(name='aiohttp_security',
       version=version,
