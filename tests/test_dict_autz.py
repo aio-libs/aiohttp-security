@@ -1,12 +1,11 @@
 import asyncio
-import socket
-import unittest
+import pytest
 
-import aiohttp
 from aiohttp import web
-from aiohttp_security import (remember, setup,
+from aiohttp_security import (remember,
                               authorized_userid, permits,
                               AbstractAuthorizationPolicy)
+from aiohttp_security import setup as _setup
 from aiohttp_security.cookies_identity import CookiesIdentityPolicy
 
 
@@ -27,133 +26,94 @@ class Autz(AbstractAuthorizationPolicy):
             return None
 
 
-class TestCookiesIdentity(unittest.TestCase):
-
-    def setUp(self):
-        self.loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(None)
-        self.client = aiohttp.ClientSession(loop=self.loop)
-
-    def tearDown(self):
-        self.client.close()
-        self.loop.run_until_complete(self.handler.finish_connections())
-        self.srv.close()
-        self.loop.run_until_complete(self.srv.wait_closed())
-        self.loop.close()
-
-    def find_unused_port(self):
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.bind(('127.0.0.1', 0))
-        port = s.getsockname()[1]
-        s.close()
-        return port
+@pytest.mark.run_loop
+def test_authorized_userid(create_app_and_client):
 
     @asyncio.coroutine
-    def create_server(self):
-        app = web.Application(loop=self.loop)
-        setup(app, CookiesIdentityPolicy(), Autz())
+    def login(request):
+        response = web.HTTPFound(location='/')
+        yield from remember(request, response, 'UserID')
+        return response
 
-        port = self.find_unused_port()
-        self.handler = app.make_handler(
-            debug=False, keep_alive_on=False)
-        srv = yield from self.loop.create_server(
-            self.handler, '127.0.0.1', port)
-        url = "http://127.0.0.1:{}".format(port)
-        self.srv = srv
-        return app, srv, url
+    @asyncio.coroutine
+    def check(request):
+        userid = yield from authorized_userid(request)
+        assert 'Andrew' == userid
+        return web.Response(text=userid)
 
-    def test_authorized_userid(self):
+    app, client = yield from create_app_and_client()
+    _setup(app, CookiesIdentityPolicy(), Autz())
+    app.router.add_route('GET', '/', check)
+    app.router.add_route('POST', '/login', login)
 
-        @asyncio.coroutine
-        def login(request):
-            response = web.HTTPFound(location='/')
-            yield from remember(request, response, 'UserID')
-            return response
+    resp = yield from client.post('/login')
+    assert 200 == resp.status
+    txt = yield from resp.text()
+    assert 'Andrew' == txt
+    yield from resp.release()
 
-        @asyncio.coroutine
-        def check(request):
-            userid = yield from authorized_userid(request)
-            self.assertEqual('Andrew', userid)
-            return web.Response(text=userid)
 
-        @asyncio.coroutine
-        def go():
-            app, srv, url = yield from self.create_server()
-            app.router.add_route('GET', '/', check)
-            app.router.add_route('POST', '/login', login)
-            resp = yield from self.client.post(url+'/login')
-            self.assertEqual(200, resp.status)
-            txt = yield from resp.text()
-            self.assertEqual('Andrew', txt)
-            yield from resp.release()
+@pytest.mark.run_loop
+def test_authorized_userid_not_authorized(create_app_and_client):
 
-        self.loop.run_until_complete(go())
+    @asyncio.coroutine
+    def check(request):
+        userid = yield from authorized_userid(request)
+        assert userid is None
+        return web.Response()
 
-    def test_authorized_userid_not_authorized(self):
+    app, client = yield from create_app_and_client()
+    _setup(app, CookiesIdentityPolicy(), Autz())
+    app.router.add_route('GET', '/', check)
+    resp = yield from client.get('/')
+    assert 200 == resp.status
+    yield from resp.release()
 
-        @asyncio.coroutine
-        def check(request):
-            userid = yield from authorized_userid(request)
-            self.assertIsNone(userid)
-            return web.Response()
 
-        @asyncio.coroutine
-        def go():
-            app, srv, url = yield from self.create_server()
-            app.router.add_route('GET', '/', check)
-            resp = yield from self.client.get(url+'/')
-            self.assertEqual(200, resp.status)
-            yield from resp.release()
+@pytest.mark.run_loop
+def test_permits(create_app_and_client):
 
-        self.loop.run_until_complete(go())
+    @asyncio.coroutine
+    def login(request):
+        response = web.HTTPFound(location='/')
+        yield from remember(request, response, 'UserID')
+        return response
 
-    def test_permits(self):
+    @asyncio.coroutine
+    def check(request):
+        ret = yield from permits(request, 'read')
+        assert ret
+        ret = yield from permits(request, 'write')
+        assert ret
+        ret = yield from permits(request, 'unknown')
+        assert not ret
+        return web.Response()
 
-        @asyncio.coroutine
-        def login(request):
-            response = web.HTTPFound(location='/')
-            yield from remember(request, response, 'UserID')
-            return response
+    app, client = yield from create_app_and_client()
+    _setup(app, CookiesIdentityPolicy(), Autz())
+    app.router.add_route('GET', '/', check)
+    app.router.add_route('POST', '/login', login)
+    resp = yield from client.post('/login')
+    assert 200 == resp.status
+    yield from resp.release()
 
-        @asyncio.coroutine
-        def check(request):
-            ret = yield from permits(request, 'read')
-            self.assertTrue(ret)
-            ret = yield from permits(request, 'write')
-            self.assertTrue(ret)
-            ret = yield from permits(request, 'unknown')
-            self.assertFalse(ret)
-            return web.Response()
 
-        @asyncio.coroutine
-        def go():
-            app, srv, url = yield from self.create_server()
-            app.router.add_route('GET', '/', check)
-            app.router.add_route('POST', '/login', login)
-            resp = yield from self.client.post(url+'/login')
-            self.assertEqual(200, resp.status)
-            yield from resp.release()
+@pytest.mark.run_loop
+def test_permits_unauthorized(create_app_and_client):
 
-        self.loop.run_until_complete(go())
+    @asyncio.coroutine
+    def check(request):
+        ret = yield from permits(request, 'read')
+        assert not ret
+        ret = yield from permits(request, 'write')
+        assert not ret
+        ret = yield from permits(request, 'unknown')
+        assert not ret
+        return web.Response()
 
-    def test_permits_unauthorized(self):
-
-        @asyncio.coroutine
-        def check(request):
-            ret = yield from permits(request, 'read')
-            self.assertFalse(ret)
-            ret = yield from permits(request, 'write')
-            self.assertFalse(ret)
-            ret = yield from permits(request, 'unknown')
-            self.assertFalse(ret)
-            return web.Response()
-
-        @asyncio.coroutine
-        def go():
-            app, srv, url = yield from self.create_server()
-            app.router.add_route('GET', '/', check)
-            resp = yield from self.client.get(url+'/')
-            self.assertEqual(200, resp.status)
-            yield from resp.release()
-
-        self.loop.run_until_complete(go())
+    app, client = yield from create_app_and_client()
+    _setup(app, CookiesIdentityPolicy(), Autz())
+    app.router.add_route('GET', '/', check)
+    resp = yield from client.get('/')
+    assert 200 == resp.status
+    yield from resp.release()

@@ -50,10 +50,13 @@ def create_server(loop, unused_port):
 
     @asyncio.coroutine
     def finish():
-        yield from handler.finish_connections()
-        yield from app.finish()
-        srv.close()
-        yield from srv.wait_closed()
+        if handler is not None:
+            yield from handler.finish_connections()
+        if app is not None:
+            yield from app.finish()
+        if srv is not None:
+            srv.close()
+            yield from srv.wait_closed()
 
     loop.run_until_complete(finish())
 
@@ -105,7 +108,8 @@ def create_app_and_client(create_server, loop):
         return app, client
 
     yield maker
-    client.close()
+    if client is not None:
+        client.close()
 
 
 @pytest.mark.tryfirst
