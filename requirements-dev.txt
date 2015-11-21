@@ -7,3 +7,4 @@ sphinx
 alabaster>=0.6.2
 pep257
 aiohttp_session
+aiopg[sa]

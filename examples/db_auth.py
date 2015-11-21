@@ -3,9 +3,9 @@ import asyncio
 from aiohttp_security.authorization import AbstractAuthorizationPolicy
 
 
-class DictionaryAuthorizationPolicy(AbstractAuthorizationPolicy):
-    def __init__(self, data):
-        self.data = data
+class DBAuthorizationPolicy(AbstractAuthorizationPolicy):
+    def __init__(self, db_pool):
+        self.db_pool = db_pool
 
     @asyncio.coroutine
     def permits(self, identity, permission, context=None):
@@ -18,4 +18,6 @@ class DictionaryAuthorizationPolicy(AbstractAuthorizationPolicy):
 
     @asyncio.coroutine
     def authorized_user_id(self, identity):
+        with (yield from self.db_pool) as conn:
+            conn
         return identity if identity in self.data else None
