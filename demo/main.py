@@ -30,17 +30,24 @@ def init(loop):
     handler = app.make_handler()
     srv = yield from loop.create_server(handler, '127.0.0.1', 8080)
     print("Server started at http://127.0.0.1:8080")
-    return srv, handler
+    return srv, app, handler
 
 
 @asyncio.coroutine
-def finalize(loop, srv, handler):
-    pass
+def finalize(srv, app, handler):
+    sock = srv.sockets[0]
+    app.loop.remove_reader(sock.fileno())
+    sock.close()
+
+    yield from handler.finish_connections(1.0)
+    srv.close()
+    yield from srv.wait_closed()
+    yield from app.finish()
 
 
 loop = asyncio.get_event_loop()
-srv, handler = loop.run_until_complete(init(loop))
+srv, app, handler = loop.run_until_complete(init(loop))
 try:
     loop.run_forever()
 except KeyboardInterrupt:
-    loop.run_until_complete((finalize(loop)))
+    loop.run_until_complete((finalize(srv, app, handler)))
