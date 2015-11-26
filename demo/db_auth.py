@@ -7,12 +7,12 @@ from . import db
 
 
 class DBAuthorizationPolicy(AbstractAuthorizationPolicy):
-    def __init__(self, db_pool):
-        self.db_pool = db_pool
+    def __init__(self, dbengine):
+        self.dbengine = dbengine
 
     @asyncio.coroutine
     def authorized_user_id(self, identity):
-        with (yield from self.db_pool) as conn:
+        with (yield from self.dbengine) as conn:
             where = [db.users.c.login == identity,
                      not db.users.c.disabled]
             query = db.users.count().where(sa.and_(*where))
@@ -24,7 +24,7 @@ class DBAuthorizationPolicy(AbstractAuthorizationPolicy):
 
     @asyncio.coroutine
     def permits(self, identity, permission, context=None):
-        with (yield from self.db_pool) as conn:
+        with (yield from self.dbengine) as conn:
             where = [db.users.c.login == identity,
                      not db.users.c.disabled]
         record = self.data.get(identity)
