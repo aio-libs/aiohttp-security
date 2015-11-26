@@ -43,7 +43,7 @@ How to Make a Simple Server With Authorization
     def init(loop):
         # set up identity and auth
         auth_policy = DictionaryAuthorizationPolicy({'me': ('view_user',),
-                                                     'you': ('view_user', 
+                                                     'you': ('view_user',
                                                              'edit_user',)})
         identity_policy = CookieIdentityPolicy()
         auth = authorization_middleware(auth_policy, identity_policy)

@@ -8,16 +8,27 @@
 .. currentmodule:: aiohttp_security
 .. highlight:: python
 
-The library is build on top of two policies: :term:`authentication`
-and :term:`authorization` and public API.
 
-API is policy agnostic, all client code should not call policy code
-directly but use API only.
+First of all, what is *aiohttp_security* about?
+
+It is a set of public API functions and standard for implementation details.
+
+API is implementation agnostic, all client code should not call policy
+code (see below) directly but use API only.
 
 Via API application can remember/forget user in local session
 (:func:`remember`/:func:`forget`), retrieve :term:`userid`
 (:func:`authorized_userid`) and check :term:`permission` for
 remembered user (:func:`permits`).
+
+The library internals are built on top of two policies:
+:term:`authentication` and :term:`authorization`. There are abstract
+base classes for both concepts as well as several implementations
+shipped with the library. End user is free to build own implemetations
+if needed.
+
+Public API
+==========
 
 
 Authentication
