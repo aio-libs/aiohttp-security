@@ -10,6 +10,7 @@ from aioredis import create_pool
 
 
 from demo.db_auth import DBAuthorizationPolicy
+from demo.handlers import Web
 
 
 @asyncio.coroutine
@@ -25,7 +26,8 @@ def init(loop):
                    SessionIdentityPolicy(),
                    DBAuthorizationPolicy(dbengine))
 
-    app.add_route()
+    web_handlers = Web()
+    yield from web_handlers.configure(app)
 
     handler = app.make_handler()
     srv = yield from loop.create_server(handler, '127.0.0.1', 8080)

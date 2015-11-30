@@ -45,3 +45,11 @@ class Web:
     @asyncio.coroutine
     def protected(self, request):
         pass
+
+    @asyncio.cororutine
+    def configure(self, app):
+        app.add_route('GET', '/', self.index, name='index')
+        app.add_route('POST', '/login', self.login, name='login')
+        app.add_route('POST', '/logout', self.logout, name='logout')
+        app.add_route('GET', '/public', self.public, name='public')
+        app.add_route('GET', '/protected', self.protected, name='protected')
