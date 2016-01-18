@@ -6,5 +6,5 @@ coverage
 sphinx
 alabaster>=0.6.2
 pep257
-aiohttp_session
+aiohttp_session>=0.4.0
 aiopg[sa]
