@@ -4,7 +4,7 @@ import functools
 from aiohttp import web
 
 
-from aiohttp_security import remember, forbid, authorized_user_id, permits
+from aiohttp_security import remember, forget, authorized_userid, permits
 
 
 def require(permission):
@@ -46,7 +46,7 @@ class Web:
     def protected(self, request):
         pass
 
-    @asyncio.cororutine
+    @asyncio.coroutine
     def configure(self, app):
         app.add_route('GET', '/', self.index, name='index')
         app.add_route('POST', '/login', self.login, name='login')

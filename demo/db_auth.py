@@ -1,7 +1,7 @@
 import asyncio
 import sqlalchemy as sa
 
-from aiohttp_security.authorization import AbstractAuthorizationPolicy
+from aiohttp_security.abc import AbstractAuthorizationPolicy
 
 from . import db
 

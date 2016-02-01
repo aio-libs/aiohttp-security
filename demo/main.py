@@ -47,9 +47,10 @@ def finalize(srv, app, handler):
     yield from app.finish()
 
 
-loop = asyncio.get_event_loop()
-srv, app, handler = loop.run_until_complete(init(loop))
-try:
-    loop.run_forever()
-except KeyboardInterrupt:
-    loop.run_until_complete((finalize(srv, app, handler)))
+def main():
+    loop = asyncio.get_event_loop()
+    srv, app, handler = loop.run_until_complete(init(loop))
+    try:
+        loop.run_forever()
+    except KeyboardInterrupt:
+        loop.run_until_complete((finalize(srv, app, handler)))
