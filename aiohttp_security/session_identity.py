@@ -11,9 +11,6 @@ from aiohttp_session import get_session
 from .abc import AbstractIdentityPolicy
 
 
-sentinel = object()
-
-
 class SessionIdentityPolicy(AbstractIdentityPolicy):
 
     def __init__(self, session_key='AIOHTTP_SECURITY'):
