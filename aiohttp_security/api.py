@@ -8,20 +8,23 @@ IDENTITY_KEY = 'aiohttp_security_identity_policy'
 AUTZ_KEY = 'aiohttp_security_autz_policy'
 
 
-def authorize(required=True):
+def authorize(required=True, redirect_url=None, permission=None):
     def wrapper(f):
         @asyncio.coroutine
         @functools.wraps(f)
-        def wrapped(**kwargs):
-            assert 'request' in kwargs
+        def wrapped(*args, **kwargs):
+            # assuming first argument is request
+            assert isinstance(args[0], web.Request)
+            request = args[0]
             if asyncio.iscoroutinefunction(f):
                 coro = f
             else:
                 coro = asyncio.coroutine(f)
-            identity = yield from get_user_identity(kwargs['request'])
-            if not identity and not required:
+            identity = yield from get_user_identity(request)
+            if not identity and required:
                 raise web.HTTPForbidden()
-            return (yield from coro(identity=identity, **kwargs))
+            kwargs['identity'] = identity
+            return (yield from coro(*args, **kwargs))
         return wrapped
     return wrapper
 
@@ -74,7 +77,6 @@ def get_user_identity(request):
         return None
     identity = yield from identity_policy.identify(request)
     return identity
-authorized_userid method in AbstractAuthorizationPolicy required?
 
 '''
 @asyncio.coroutine
