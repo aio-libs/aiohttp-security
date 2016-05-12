@@ -44,13 +44,3 @@ class AbstractAuthorizationPolicy(metaclass=abc.ABCMeta):
         current context, else return False.
         """
         pass
-
-    @asyncio.coroutine
-    @abc.abstractmethod
-    def authorized_userid(self, identity):
-        """Retrieve authorized user id.
-
-        Return the user_id of the user identified by the identity
-        or 'None' if no user exists related to the identity.
-        """
-        pass
