@@ -2,7 +2,7 @@ import asyncio
 import pytest
 
 from aiohttp import web
-from aiohttp_security import authorized_userid, permits
+from aiohttp_security import permits, get_user_identity
 
 
 @pytest.mark.run_loop
@@ -10,7 +10,7 @@ def test_authorized_userid(create_app_and_client):
 
     @asyncio.coroutine
     def check(request):
-        userid = yield from authorized_userid(request)
+        userid = yield from get_user_identity(request)
         assert userid is None
         return web.Response()
 

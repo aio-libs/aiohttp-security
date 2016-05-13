@@ -1,6 +1,8 @@
 import asyncio
 import functools
+
 from aiohttp import web
+
 from aiohttp_security.abc import (AbstractIdentityPolicy,
                                   AbstractAuthorizationPolicy)
 
@@ -16,18 +18,34 @@ def authorize(required=True, redirect_url=None, permission=None):
             # assuming first argument is request
             assert isinstance(args[0], web.Request)
             request = args[0]
+
+            # check if coroutine
             if asyncio.iscoroutinefunction(f):
                 coro = f
             else:
                 coro = asyncio.coroutine(f)
-            identity = yield from get_user_identity(request)
-            if not identity and required:
-                raise web.HTTPForbidden()
-            kwargs['identity'] = identity
-            return (yield from coro(*args, **kwargs))
-        return wrapped
-    return wrapper
 
+            # get identity
+            identity = yield from get_user_identity(request)
+            kwargs['identity'] = identity
+
+            if required:
+
+                # check identity
+                if not identity:
+                    return web.HTTPFound(redirect_url) if redirect_url \
+                        else web.HTTPForbidden(reason='not authenticated')
+
+                # check permission
+                allowed = yield from permits(request, permission)
+                if permission and not allowed:
+                    return web.HTTPForbidden(reason='unauthorized')
+
+            return (yield from coro(*args, **kwargs))
+
+        return wrapped
+
+    return wrapper
 
 
 @asyncio.coroutine
@@ -78,6 +96,7 @@ def get_user_identity(request):
     identity = yield from identity_policy.identify(request)
     return identity
 
+
 '''
 @asyncio.coroutine
 def authorized_userid(request):
@@ -98,6 +117,8 @@ def permits(request, permission, context=None):
     assert isinstance(permission, str), permission
     assert permission
     autz_policy = request.app.get(AUTZ_KEY)
+    if autz_policy is None:
+        return True
     identity = yield from get_user_identity(request)
     access = yield from autz_policy.permits(identity, permission, context)
     return access

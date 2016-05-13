@@ -15,10 +15,6 @@ class Autz(AbstractAuthorizationPolicy):
     def permits(self, identity, permission, context=None):
         pass
 
-    @asyncio.coroutine
-    def authorized_userid(self, identity):
-        pass
-
 
 @pytest.mark.run_loop
 def test_remember(create_app_and_client):
