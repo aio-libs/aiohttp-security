@@ -26,7 +26,7 @@ def authorize(required=True, redirect_url=None, permission=None):
                 coro = asyncio.coroutine(f)
 
             # get identity
-            identity = yield from get_user_identity(request)
+            identity = yield from authorized_userid(request)
             kwargs['identity'] = identity
 
             if required:
@@ -89,7 +89,7 @@ def forget(request, response):
 
 
 @asyncio.coroutine
-def get_user_identity(request):
+def authorized_userid(request):
     identity_policy = request.app.get(IDENTITY_KEY)
     if identity_policy is None:
         return None
@@ -119,7 +119,7 @@ def permits(request, permission, context=None):
     autz_policy = request.app.get(AUTZ_KEY)
     if autz_policy is None:
         return True
-    identity = yield from get_user_identity(request)
+    identity = yield from authorized_userid(request)
     access = yield from autz_policy.permits(identity, permission, context)
     return access
 
