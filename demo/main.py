@@ -54,3 +54,7 @@ def main():
         loop.run_forever()
     except KeyboardInterrupt:
         loop.run_until_complete((finalize(srv, app, handler)))
+
+
+if __name__ == '__main__':
+    main()

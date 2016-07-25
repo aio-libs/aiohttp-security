@@ -1,8 +1,11 @@
+.. _aiohttp-security-example:
+
+===============================================
 How to Make a Simple Server With Authorization
-==============================================
+===============================================
 
 
-.. code::python
+Simple example::
 
     import asyncio
     from aiohttp import web

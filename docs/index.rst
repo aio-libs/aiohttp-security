@@ -20,6 +20,7 @@ Contents:
    usage
    reference
    example
+   example_db_auth
    glossary
 
 

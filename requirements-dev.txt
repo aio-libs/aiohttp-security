@@ -8,3 +8,5 @@ alabaster>=0.6.2
 pep257
 aiohttp_session>=0.4.0
 aiopg[sa]
+aioredis==0.2.8
+hiredis==0.2.0
