@@ -1,7 +1,7 @@
 """Identity policy for storing info into aiohttp_session session.
 
 aiohttp_session.setup() should be called on application initialization
-to conffigure aiohttp_session properly.
+to configure aiohttp_session properly.
 """
 
 import asyncio
@@ -19,6 +19,7 @@ class SessionIdentityPolicy(AbstractIdentityPolicy):
     @asyncio.coroutine
     def identify(self, request):
         session = yield from get_session(request)
+        print('session', session)
         return session.get(self._session_key)
 
     @asyncio.coroutine

@@ -36,7 +36,7 @@ class DBAuthorizationPolicy(AbstractAuthorizationPolicy):
             user = yield from ret.fetchone()
             if user is not None:
                 user_id = user[0]
-                is_superuser = user[4]
+                is_superuser = user[3]
                 if is_superuser:
                     return True
 

@@ -1,6 +1,3 @@
-CREATE USER aiohttp_security WITH PASSWORD 'aiohttp_security';
-CREATE DATABASE aiohttp_security;
-GRANT ALL PRIVILEGES ON DATABASE aiohttp_security TO aiohttp_security;
 -- create users table
 CREATE TABLE IF NOT EXISTS users
 (
@@ -26,6 +23,13 @@ CREATE TABLE IF NOT EXISTS permissions
 );
 
 -- insert some data
+INSERT INTO users(id, login, passwd, is_superuser, disabled)
+VALUES (1, 'admin', 'admin_pass', TRUE, FALSE);
+INSERT INTO users(id, login, passwd, is_superuser, disabled)
+VALUES (2, 'moderator', 'moderator_pass', FALSE, FALSE);
+INSERT INTO users(id, login, passwd, is_superuser, disabled)
+VALUES (3, 'user', 'user_pass', FALSE, FALSE);
+
 INSERT INTO public.permissions(id, user_id, perm_name)
 VALUES (1, 2, 'protected');
 INSERT INTO public.permissions(id, user_id, perm_name)
@@ -33,9 +37,4 @@ VALUES (2, 2, 'public');
 INSERT INTO public.permissions(id, user_id, perm_name)
 VALUES (3, 3, 'public');
 
-INSERT INTO users(id, login, passwd, is_superuser, disabled)
-VALUES (1, 'admin', 'admin_pass', TRUE, FALSE);
-INSERT INTO users(id, login, passwd, is_superuser, disabled)
-VALUES (2, 'moderator', 'moderator_pass', FALSE, FALSE);
-INSERT INTO users(id, login, passwd, is_superuser, disabled)
-VALUES (3, 'user', 'user_pass', FALSE, FALSE);
+

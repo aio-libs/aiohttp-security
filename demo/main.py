@@ -27,11 +27,11 @@ def init(loop):
                    DBAuthorizationPolicy(dbengine))
 
     web_handlers = Web()
-    yield from web_handlers.configure(app)
+    web_handlers.configure(app)
 
     handler = app.make_handler()
     srv = yield from loop.create_server(handler, '127.0.0.1', 8080)
-    print("Server started at http://127.0.0.1:8080")
+    print('Server started at http://127.0.0.1:8080')
     return srv, app, handler
 
 

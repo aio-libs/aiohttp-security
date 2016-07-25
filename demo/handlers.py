@@ -40,7 +40,7 @@ class Web(object):
 
     @asyncio.coroutine
     def index(self, request):
-        username = yield authorized_userid(request)
+        username = yield from authorized_userid(request)
         if username:
             template = self.index_template.format(
                 message='Hello, {username}!'.format(username=username))
@@ -51,13 +51,13 @@ class Web(object):
 
     @asyncio.coroutine
     def login(self, request):
-        response = web.Response(body=b'This is index page')
-        form = yield request.post()
+        response = web.HTTPFound('/')
+        form = yield from request.post()
         login = form.get('login')
         password = form.get('password')
         # here you can check for correct user/password combination
-        yield remember(request, response, login)
-        return web.HTTPFound('/')
+        yield from remember(request, response, login)
+        return response
 
     @require('public')
     @asyncio.coroutine
