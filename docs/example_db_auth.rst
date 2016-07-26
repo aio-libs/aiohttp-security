@@ -14,7 +14,7 @@ the `demo source`_.
 Database
 --------
 
-Launch script to fill database with sample data like this:
+Launch these sql scripts to init database and fill it with sample data:
 ``psql template1 < demo/sql/sample_data.sql``.
 
 
