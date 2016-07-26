@@ -19,7 +19,6 @@ class SessionIdentityPolicy(AbstractIdentityPolicy):
     @asyncio.coroutine
     def identify(self, request):
         session = yield from get_session(request)
-        print('session', session)
         return session.get(self._session_key)
 
     @asyncio.coroutine

@@ -33,7 +33,6 @@ def test_remember(create_app_and_client):
     _setup(app, CookiesIdentityPolicy(), Autz())
     app.router.add_route('GET', '/', handler)
     resp = yield from client.get('/')
-    import pdb; pdb.set_trace()
     assert 200 == resp.status
     assert 'Andrew' == resp.cookies['AIOHTTP_SECURITY'].value
     yield from resp.release()
@@ -99,5 +98,6 @@ def test_forget(create_app_and_client):
     resp = yield from client.post('/logout')
     assert 200 == resp.status
     assert resp.url.endswith('/')
-    assert '' == client.cookies['AIOHTTP_SECURITY'].value
+    with pytest.raises(KeyError):
+        _ = client.cookies['AIOHTTP_SECURITY']
     yield from resp.release()

@@ -1,8 +1,10 @@
-import aiohttp
-import asyncio
 import gc
-import pytest
 import socket
+import asyncio
+
+import pytest
+import aiohttp
+
 from aiohttp import web
 
 
@@ -68,10 +70,6 @@ class Client:
             url += '/'
         self._url = url
 
-    def update_cookies(self, cookies):
-        # todo: why cookies are not set on client after request
-        self._session._cookie_jar.update_cookies(cookies)
-
     @property
     def cookies(self):
         return self._session.cookies
@@ -102,7 +100,7 @@ class Client:
 @pytest.yield_fixture
 def create_app_and_client(create_server, loop):
     client = None
-    cookie_jar = aiohttp.CookieJar(loop=loop)
+    cookie_jar = aiohttp.CookieJar(loop=loop, unsafe=True)
 
     @asyncio.coroutine
     def maker(*, server_params=None, client_params=None):

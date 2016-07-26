@@ -1,15 +1,13 @@
 import asyncio
 import pytest
 
-import aiohttp
 from aiohttp import web
 from aiohttp_security import (remember, forget,
                               AbstractAuthorizationPolicy)
 from aiohttp_security import setup as setup_security
 from aiohttp_security.session_identity import SessionIdentityPolicy
 from aiohttp_security.api import IDENTITY_KEY
-from aiohttp_session import (SimpleCookieStorage, session_middleware,
-                             get_session)
+from aiohttp_session import SimpleCookieStorage, get_session
 from aiohttp_session import setup as setup_session
 
 
@@ -57,7 +55,6 @@ def test_remember(create_app_and_client2):
     assert 200 == resp.status
     yield from resp.release()
 
-    client.update_cookies(resp.cookies)
     resp = yield from client.get('/check')
     assert 200 == resp.status
     yield from resp.release()
@@ -70,7 +67,6 @@ def test_identify(create_app_and_client2):
     def create(request):
         response = web.Response()
         yield from remember(request, response, 'Andrew')
-        import pdb; pdb.set_trace()
         return response
 
     @asyncio.coroutine
@@ -87,7 +83,6 @@ def test_identify(create_app_and_client2):
     assert 200 == resp.status
     yield from resp.release()
 
-    client.update_cookies(resp.cookies)
     resp = yield from client.get('/')
     assert 200 == resp.status
     yield from resp.release()
@@ -99,7 +94,6 @@ def test_forget(create_app_and_client2):
     @asyncio.coroutine
     def index(request):
         session = yield from get_session(request)
-        print(session)
         return web.HTTPOk(text=session.get('AIOHTTP_SECURITY', ''))
 
     @asyncio.coroutine
@@ -118,19 +112,17 @@ def test_forget(create_app_and_client2):
     app.router.add_route('GET', '/', index)
     app.router.add_route('POST', '/login', login)
     app.router.add_route('POST', '/logout', logout)
-    # client.update_cookies('')
+
     resp = yield from client.post('/login')
-    import pdb; pdb.set_trace()
     assert 200 == resp.status
     assert resp.url.endswith('/')
     txt = yield from resp.text()
     assert 'Andrew' == txt
     yield from resp.release()
 
-    # client.update_cookies(resp.cookies)
-    # resp = yield from client.post('/logout')
-    # assert 200 == resp.status
-    # assert resp.url.endswith('/')
-    # txt = yield from resp.text()
-    # assert '' == txt
-    # yield from resp.release()
+    resp = yield from client.post('/logout')
+    assert 200 == resp.status
+    assert resp.url.endswith('/')
+    txt = yield from resp.text()
+    assert '' == txt
+    yield from resp.release()
