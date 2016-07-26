@@ -15,7 +15,12 @@ Database
 --------
 
 Launch these sql scripts to init database and fill it with sample data:
-``psql template1 < demo/sql/sample_data.sql``.
+
+``psql template1 < demo/sql/init_db.sql``
+
+and then
+
+``psql template1 < demo/sql/sample_data.sql``
 
 
 You will have two tables for storing users and their permissions
