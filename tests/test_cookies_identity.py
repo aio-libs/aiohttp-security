@@ -99,5 +99,5 @@ def test_forget(create_app_and_client):
     assert 200 == resp.status
     assert resp.url.endswith('/')
     with pytest.raises(KeyError):
-        _ = client.cookies['AIOHTTP_SECURITY']
+        _ = client.cookies['AIOHTTP_SECURITY']  # noqa
     yield from resp.release()
