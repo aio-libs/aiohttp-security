@@ -5,6 +5,8 @@ from aiohttp import web
 
 from aiohttp_security import remember, forget, authorized_userid, permits
 
+from .db_auth import check_credentials
+
 
 def require(permission):
     def wrapper(f):
@@ -55,9 +57,13 @@ class Web(object):
         form = yield from request.post()
         login = form.get('login')
         password = form.get('password')
-        # here you can check for correct user/password combination
-        yield from remember(request, response, login)
-        return response
+        db_engine = request.app.db_engine
+        if (yield from check_credentials(db_engine, login, password)):
+            yield from remember(request, response, login)
+            return response
+
+        return web.HTTPUnauthorized(
+            body=b'Invalid username/password combination')
 
     @require('public')
     @asyncio.coroutine

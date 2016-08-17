@@ -24,11 +24,11 @@ CREATE TABLE IF NOT EXISTS permissions
 
 -- insert some data
 INSERT INTO users(id, login, passwd, is_superuser, disabled)
-VALUES (1, 'admin', 'admin_pass', TRUE, FALSE);
+VALUES (1, 'admin', '$5$rounds=535000$2kqN9fxCY6Xt5/pi$tVnh0xX87g/IsnOSuorZG608CZDFbWIWBr58ay6S4pD', TRUE, FALSE);
 INSERT INTO users(id, login, passwd, is_superuser, disabled)
-VALUES (2, 'moderator', 'moderator_pass', FALSE, FALSE);
+VALUES (2, 'moderator', '$5$rounds=535000$2kqN9fxCY6Xt5/pi$tVnh0xX87g/IsnOSuorZG608CZDFbWIWBr58ay6S4pD', FALSE, FALSE);
 INSERT INTO users(id, login, passwd, is_superuser, disabled)
-VALUES (3, 'user', 'user_pass', FALSE, FALSE);
+VALUES (3, 'user', '$5$rounds=535000$2kqN9fxCY6Xt5/pi$tVnh0xX87g/IsnOSuorZG608CZDFbWIWBr58ay6S4pD', FALSE, FALSE);
 
 INSERT INTO permissions(id, user_id, perm_name)
 VALUES (1, 2, 'protected');

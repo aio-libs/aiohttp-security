@@ -3,6 +3,7 @@ import asyncio
 import sqlalchemy as sa
 
 from aiohttp_security.abc import AbstractAuthorizationPolicy
+from passlib.hash import sha256_crypt
 
 from . import db
 
@@ -50,3 +51,17 @@ class DBAuthorizationPolicy(AbstractAuthorizationPolicy):
                             return True
 
             return False
+
+
+@asyncio.coroutine
+def check_credentials(db_engine, username, password):
+    with (yield from db_engine) as conn:
+        where = sa.and_(db.users.c.login == username,
+                        sa.not_(db.users.c.disabled))
+        query = db.users.select().where(where)
+        ret = yield from conn.execute(query)
+        user = yield from ret.fetchone()
+        if user is not None:
+            hash = user[2]
+            return sha256_crypt.verify(password, hash)
+    return False

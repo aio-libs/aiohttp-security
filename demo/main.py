@@ -16,15 +16,16 @@ from demo.handlers import Web
 @asyncio.coroutine
 def init(loop):
     redis_pool = yield from create_pool(('localhost', 6379))
-    dbengine = yield from create_engine(user='aiohttp_security',
-                                        password='aiohttp_security',
-                                        database='aiohttp_security',
-                                        host='127.0.0.1')
+    db_engine = yield from create_engine(user='aiohttp_security',
+                                         password='aiohttp_security',
+                                         database='aiohttp_security',
+                                         host='127.0.0.1')
     app = web.Application(loop=loop)
+    app.db_engine = db_engine
     setup_session(app, RedisStorage(redis_pool))
     setup_security(app,
                    SessionIdentityPolicy(),
-                   DBAuthorizationPolicy(dbengine))
+                   DBAuthorizationPolicy(db_engine))
 
     web_handlers = Web()
     web_handlers.configure(app)
