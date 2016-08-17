@@ -9,7 +9,10 @@ If you want the full source code in advance or for comparison, check out
 the `demo source`_.
 
 .. _demo source:
-   https://github.com/aio-libs/aiohttp_security/tree/master/demo
+    https://github.com/aio-libs/aiohttp_security/tree/master/demo
+
+.. _passlib:
+    https://pythonhosted.org/passlib/
 
 Database
 --------
@@ -166,6 +169,7 @@ For each view you need to protect just apply the decorator on it::
             response = web.Response(body=b'You are on protected page')
             return response
 
+
 If someone will try to access this protected page he will see::
 
     403, User has no permission "protected"
@@ -173,3 +177,34 @@ If someone will try to access this protected page he will see::
 
 The best part about it is that you can implement any logic you want until it
 follows the API conventions.
+
+Launch application
+------------------
+
+For working with passwords there is a good library passlib_. Once you've
+created some users you want to check their credentials on login. Similar
+function may do what you trying to accomplish::
+
+    from passlib.hash import sha256_crypt
+
+    @asyncio.coroutine
+    def check_credentials(db_engine, username, password):
+        with (yield from db_engine) as conn:
+            where = sa.and_(db.users.c.login == username,
+                            sa.not_(db.users.c.disabled))
+            query = db.users.select().where(where)
+            ret = yield from conn.execute(query)
+            user = yield from ret.fetchone()
+            if user is not None:
+                hash = user[2]
+                return sha256_crypt.verify(password, hash)
+        return False
+
+
+Final step is to launch your application::
+
+    python demo/main.py
+
+
+Try to login with admin/moderator/user accounts (with *password* password)
+and access **/public** or **/protected** endpoints.
