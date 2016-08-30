@@ -1,4 +1,4 @@
-"""Identity polocy for storing info directly into HTTP cookie.
+"""Identity policy for storing info directly into HTTP cookie.
 
 Use mostly for demonstration purposes, SessionIdentityPolicy is much
 more handy.

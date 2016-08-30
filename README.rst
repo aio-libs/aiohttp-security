@@ -9,6 +9,14 @@ __ aiohttp_web_
 
 Usage
 -----
+To install type ``pip install aiohttp_security``.
+Launch ``make doc`` and see examples or look under **demo** directory for a
+sample project.
+
+Develop
+-------
+
+``pip install -r requirements-dev``
 
 
 License

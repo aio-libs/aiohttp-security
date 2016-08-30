@@ -1,8 +1,11 @@
+.. _aiohttp-security-example:
+
+===============================================
 How to Make a Simple Server With Authorization
-==============================================
+===============================================
 
 
-.. code::python
+Simple example::
 
     import asyncio
     from aiohttp import web
@@ -13,7 +16,7 @@ How to Make a Simple Server With Authorization
         return web.Response(body=text.encode('utf-8'))
 
     # option 2: auth at a higher level?
-    # set user_id and allowed in the wsgo handler
+    # set user_id and allowed in the wsgi handler
     @protect('view_user')
     @asyncio.coroutine
     def user_handler(request):

@@ -1,7 +1,7 @@
 """Identity policy for storing info into aiohttp_session session.
 
 aiohttp_session.setup() should be called on application initialization
-to conffigure aiohttp_session properly.
+to configure aiohttp_session properly.
 """
 
 import asyncio

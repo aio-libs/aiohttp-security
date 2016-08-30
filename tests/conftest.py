@@ -1,8 +1,10 @@
-import aiohttp
-import asyncio
 import gc
-import pytest
 import socket
+import asyncio
+
+import pytest
+import aiohttp
+
 from aiohttp import web
 
 
@@ -79,7 +81,8 @@ class Client:
         while path.startswith('/'):
             path = path[1:]
         url = self._url + path
-        return self._session.get(url, **kwargs)
+        resp = self._session.get(url, **kwargs)
+        return resp
 
     def post(self, path, **kwargs):
         while path.startswith('/'):
@@ -97,6 +100,7 @@ class Client:
 @pytest.yield_fixture
 def create_app_and_client(create_server, loop):
     client = None
+    cookie_jar = aiohttp.CookieJar(loop=loop, unsafe=True)
 
     @asyncio.coroutine
     def maker(*, server_params=None, client_params=None):
@@ -108,7 +112,11 @@ def create_app_and_client(create_server, loop):
         app, url = yield from create_server(**server_params)
         if client_params is None:
             client_params = {}
-        client = Client(aiohttp.ClientSession(loop=loop, **client_params), url)
+
+        client = Client(
+            aiohttp.ClientSession(loop=loop, cookie_jar=cookie_jar),
+            url
+        )
         return app, client
 
     yield maker

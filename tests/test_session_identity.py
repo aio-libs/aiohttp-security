@@ -7,8 +7,8 @@ from aiohttp_security import (remember, forget,
 from aiohttp_security import setup as setup_security
 from aiohttp_security.session_identity import SessionIdentityPolicy
 from aiohttp_security.api import IDENTITY_KEY
-from aiohttp_session import (SimpleCookieStorage, session_middleware,
-                             get_session)
+from aiohttp_session import SimpleCookieStorage, get_session
+from aiohttp_session import setup as setup_session
 
 
 class Autz(AbstractAuthorizationPolicy):
@@ -27,7 +27,7 @@ def create_app_and_client2(create_app_and_client):
     @asyncio.coroutine
     def maker(*args, **kwargs):
         app, client = yield from create_app_and_client(*args, **kwargs)
-        app.middlewares.append(session_middleware(SimpleCookieStorage()))
+        setup_session(app, SimpleCookieStorage())
         setup_security(app, SessionIdentityPolicy(), Autz())
         return app, client
     return maker
@@ -82,6 +82,7 @@ def test_identify(create_app_and_client2):
     resp = yield from client.post('/')
     assert 200 == resp.status
     yield from resp.release()
+
     resp = yield from client.get('/')
     assert 200 == resp.status
     yield from resp.release()
@@ -103,7 +104,7 @@ def test_forget(create_app_and_client2):
 
     @asyncio.coroutine
     def logout(request):
-        response = web.HTTPFound(location='/')
+        response = web.HTTPFound('/')
         yield from forget(request, response)
         return response
 
@@ -111,12 +112,14 @@ def test_forget(create_app_and_client2):
     app.router.add_route('GET', '/', index)
     app.router.add_route('POST', '/login', login)
     app.router.add_route('POST', '/logout', logout)
+
     resp = yield from client.post('/login')
     assert 200 == resp.status
     assert resp.url.endswith('/')
     txt = yield from resp.text()
     assert 'Andrew' == txt
     yield from resp.release()
+
     resp = yield from client.post('/logout')
     assert 200 == resp.status
     assert resp.url.endswith('/')
