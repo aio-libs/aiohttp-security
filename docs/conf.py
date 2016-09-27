@@ -41,8 +41,6 @@ with codecs.open(_version_path, 'r', 'latin1') as fp:
 sys.path.insert(0, os.path.abspath('..'))
 sys.path.insert(0, os.path.abspath('.'))
 
-import alabaster
-
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -146,8 +144,10 @@ html_theme_options = {
     'github_user': 'aio-libs',
     'github_repo': 'aiohttp_security',
     'github_button': True,
+    'github_style': 'star',
     'github_banner': True,
     'travis_button': True,
+    'codecov_button': True,
     'pre_bg': '#FFF6E5',
     'note_bg': '#E5ECD1',
     'note_border': '#BFCF8C',
@@ -157,7 +157,7 @@ html_theme_options = {
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
-html_theme_path = [alabaster.get_path()]
+# html_theme_path = [alabaster.get_path()]
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".

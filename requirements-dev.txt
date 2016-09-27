@@ -4,10 +4,10 @@ pytest
 pytest-cov
 coverage
 sphinx
-alabaster>=0.6.2
 pep257
-aiohttp_session>=0.4.0
+aiohttp_session
 aiopg[sa]
 aioredis==0.2.8
 hiredis==0.2.0
 passlib==1.6.5
+aiohttp
