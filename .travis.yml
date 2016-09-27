@@ -6,16 +6,16 @@ python:
 install:
 - pip install --upgrade pip
 - pip install -r requirements-dev.txt
-- pip install coveralls
+- pip install codecov
 
 script:
 - flake8 aiohttp_security tests
 - coverage run --source=aiohttp_security setup.py test
 
 after_success:
-- coveralls
+- codecov
 
 env:
   matrix:
-  - PYTHONASYNCIODEBUG=1
-  - PYTHONASYNCIODEBUG=0
+  - PYTHONASYNCIODEBUG=x
+  - PYTHONASYNCIODEBUG=
