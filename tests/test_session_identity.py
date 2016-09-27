@@ -23,18 +23,15 @@ class Autz(AbstractAuthorizationPolicy):
 
 
 @pytest.fixture
-def create_app_and_client2(create_app_and_client):
-    @asyncio.coroutine
-    def maker(*args, **kwargs):
-        app, client = yield from create_app_and_client(*args, **kwargs)
-        setup_session(app, SimpleCookieStorage())
-        setup_security(app, SessionIdentityPolicy(), Autz())
-        return app, client
-    return maker
+def make_app(loop):
+    app = web.Application(loop=loop)
+    setup_session(app, SimpleCookieStorage())
+    setup_security(app, SessionIdentityPolicy(), Autz())
+    return app
 
 
-@pytest.mark.run_loop
-def test_remember(create_app_and_client2):
+@asyncio.coroutine
+def test_remember(make_app, test_client):
 
     @asyncio.coroutine
     def handler(request):
@@ -48,9 +45,10 @@ def test_remember(create_app_and_client2):
         assert session['AIOHTTP_SECURITY'] == 'Andrew'
         return web.HTTPOk()
 
-    app, client = yield from create_app_and_client2()
+    app = make_app()
     app.router.add_route('GET', '/', handler)
     app.router.add_route('GET', '/check', check)
+    client = yield from test_client(app)
     resp = yield from client.get('/')
     assert 200 == resp.status
     yield from resp.release()
@@ -60,8 +58,8 @@ def test_remember(create_app_and_client2):
     yield from resp.release()
 
 
-@pytest.mark.run_loop
-def test_identify(create_app_and_client2):
+@asyncio.coroutine
+def test_identify(make_app, test_client):
 
     @asyncio.coroutine
     def create(request):
@@ -76,9 +74,10 @@ def test_identify(create_app_and_client2):
         assert 'Andrew' == user_id
         return web.Response()
 
-    app, client = yield from create_app_and_client2()
+    app = make_app()
     app.router.add_route('GET', '/', check)
     app.router.add_route('POST', '/', create)
+    client = yield from test_client(app)
     resp = yield from client.post('/')
     assert 200 == resp.status
     yield from resp.release()
@@ -88,8 +87,8 @@ def test_identify(create_app_and_client2):
     yield from resp.release()
 
 
-@pytest.mark.run_loop
-def test_forget(create_app_and_client2):
+@asyncio.coroutine
+def test_forget(make_app, test_client):
 
     @asyncio.coroutine
     def index(request):
@@ -108,10 +107,12 @@ def test_forget(create_app_and_client2):
         yield from forget(request, response)
         return response
 
-    app, client = yield from create_app_and_client2()
+    app = make_app()
     app.router.add_route('GET', '/', index)
     app.router.add_route('POST', '/login', login)
     app.router.add_route('POST', '/logout', logout)
+
+    client = yield from test_client(app)
 
     resp = yield from client.post('/login')
     assert 200 == resp.status

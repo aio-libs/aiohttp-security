@@ -1,5 +1,4 @@
 import asyncio
-import pytest
 
 from aiohttp import web
 from aiohttp_security import (remember, forget,
@@ -20,8 +19,8 @@ class Autz(AbstractAuthorizationPolicy):
         pass
 
 
-@pytest.mark.run_loop
-def test_remember(create_app_and_client):
+@asyncio.coroutine
+def test_remember(loop, test_client):
 
     @asyncio.coroutine
     def handler(request):
@@ -29,17 +28,18 @@ def test_remember(create_app_and_client):
         yield from remember(request, response, 'Andrew')
         return response
 
-    app, client = yield from create_app_and_client()
+    app = web.Application(loop=loop)
     _setup(app, CookiesIdentityPolicy(), Autz())
     app.router.add_route('GET', '/', handler)
+    client = yield from test_client(app)
     resp = yield from client.get('/')
     assert 200 == resp.status
     assert 'Andrew' == resp.cookies['AIOHTTP_SECURITY'].value
     yield from resp.release()
 
 
-@pytest.mark.run_loop
-def test_identify(create_app_and_client):
+@asyncio.coroutine
+def test_identify(loop, test_client):
 
     @asyncio.coroutine
     def create(request):
@@ -54,10 +54,11 @@ def test_identify(create_app_and_client):
         assert 'Andrew' == user_id
         return web.Response()
 
-    app, client = yield from create_app_and_client()
+    app = web.Application(loop=loop)
     _setup(app, CookiesIdentityPolicy(), Autz())
     app.router.add_route('GET', '/', check)
     app.router.add_route('POST', '/', create)
+    client = yield from test_client(app)
     resp = yield from client.post('/')
     assert 200 == resp.status
     yield from resp.release()
@@ -66,8 +67,8 @@ def test_identify(create_app_and_client):
     yield from resp.release()
 
 
-@pytest.mark.run_loop
-def test_forget(create_app_and_client):
+@asyncio.coroutine
+def test_forget(loop, test_client):
 
     @asyncio.coroutine
     def index(request):
@@ -85,19 +86,23 @@ def test_forget(create_app_and_client):
         yield from forget(request, response)
         return response
 
-    app, client = yield from create_app_and_client()
+    app = web.Application(loop=loop)
     _setup(app, CookiesIdentityPolicy(), Autz())
     app.router.add_route('GET', '/', index)
     app.router.add_route('POST', '/login', login)
     app.router.add_route('POST', '/logout', logout)
+    client = yield from test_client(app)
     resp = yield from client.post('/login')
     assert 200 == resp.status
     assert resp.url.endswith('/')
-    assert 'Andrew' == client.cookies['AIOHTTP_SECURITY'].value
+    cookies = client.session.cookie_jar.filter_cookies(
+        client.make_url('/'))
+    assert 'Andrew' == cookies['AIOHTTP_SECURITY'].value
     yield from resp.release()
     resp = yield from client.post('/logout')
     assert 200 == resp.status
     assert resp.url.endswith('/')
-    with pytest.raises(KeyError):
-        _ = client.cookies['AIOHTTP_SECURITY']  # noqa
+    cookies = client.session.cookie_jar.filter_cookies(
+        client.make_url('/'))
+    assert 'AIOHTTP_SECURITY' not in cookies
     yield from resp.release()
