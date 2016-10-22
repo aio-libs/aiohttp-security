@@ -29,9 +29,9 @@ def read(f):
 
 install_requires = ['aiohttp>=0.18']
 tests_require = install_requires + ['pytest']
-extras_require = {'session': 'aiohttp_session'}
+extras_require = {'session': 'aiohttp-session'}
 
-setup(name='aiohttp_security',
+setup(name='aiohttp-security',
       version=version,
       description=("security for aiohttp.web"),
       long_description='\n\n'.join((read('README.rst'), read('CHANGES.txt'))),
