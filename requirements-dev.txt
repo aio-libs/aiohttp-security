@@ -1,14 +1,14 @@
 -e .
-flake8
-pytest
-pytest-cov
-coverage
-sphinx
-pep257
-aiohttp_session
-aiopg[sa]
-aioredis==0.2.8
+flake8==3.2.1
+pytest==3.0.4
+pytest-cov==2.4.0
+coverage==4.2
+sphinx==1.4.9
+pep257==0.7.0
+aiohttp-session==0.7.1
+aiopg[sa]==0.12.0
+aioredis==0.2.9
 hiredis==0.2.0
-passlib==1.6.5
-aiohttp
-pytest-aiohttp
+passlib==1.7.0
+aiohttp==1.1.5
+pytest-aiohttp==0.1.2
