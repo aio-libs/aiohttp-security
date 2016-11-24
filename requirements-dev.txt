@@ -1,6 +1,6 @@
 -e .
 flake8==3.2.1
-pytest
+pytest==3.0.4
 pytest-cov
 coverage
 sphinx
