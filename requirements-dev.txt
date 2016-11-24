@@ -10,5 +10,5 @@ aiopg[sa]
 aioredis==0.2.8
 hiredis==0.2.0
 passlib==1.7.0
-aiohttp
+aiohttp==1.1.5
 pytest-aiohttp
