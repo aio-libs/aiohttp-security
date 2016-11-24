@@ -4,7 +4,7 @@ pytest
 pytest-cov
 coverage
 sphinx
-pep257
+pep257==0.7.0
 aiohttp-session==0.7.1
 aiopg[sa]
 aioredis==0.2.9
