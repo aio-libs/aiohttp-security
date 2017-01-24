@@ -144,7 +144,6 @@ html_theme_options = {
     'github_user': 'aio-libs',
     'github_repo': 'aiohttp_security',
     'github_button': True,
-    'github_style': 'star',
     'github_banner': True,
     'travis_button': True,
     'codecov_button': True,
