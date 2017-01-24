@@ -2,7 +2,7 @@
 flake8==3.2.1
 pytest==3.0.5
 pytest-cov==2.4.0
-coverage==4.3
+coverage==4.3.2
 sphinx==1.5.1
 pep257==0.7.0
 aiohttp-session==0.8.0
