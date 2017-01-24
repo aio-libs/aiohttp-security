@@ -13,6 +13,11 @@ To install type ``pip install aiohttp_security``.
 Launch ``make doc`` and see examples or look under **demo** directory for a
 sample project.
 
+Documentation
+-------------
+
+https://aiohttp-security.readthedocs.io/
+
 Develop
 -------
 
