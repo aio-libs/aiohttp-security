@@ -142,7 +142,7 @@ html_theme_options = {
     'logo': 'aiohttp-icon-128x128.png',
     'description': 'Authorization and identity for aoihttp',
     'github_user': 'aio-libs',
-    'github_repo': 'aiohttp_security',
+    'github_repo': 'aiohttp-security',
     'github_button': True,
     'github_banner': True,
     'travis_button': True,
