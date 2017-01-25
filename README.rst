@@ -4,6 +4,10 @@ aiohttp_security
     :target: https://travis-ci.org/aio-libs/aiohttp-security
 .. image:: https://codecov.io/github/aio-libs/aiohttp-security/coverage.svg?branch=master
     :target: https://codecov.io/github/aio-libs/aiohttp-security
+.. image:: https://readthedocs.org/projects/aiohttp-security/badge/?version=latest
+    :target: https://aiohttp-security.readthedocs.io/
+.. image:: https://img.shields.io/pypi/v/aiohttp-security.svg
+    :target: https://pypi.python.org/pypi/aiohttp-security
 
 The library provides identity and autorization for `aiohttp.web`__.
 
