@@ -94,14 +94,14 @@ def test_forget(loop, test_client):
     client = yield from test_client(app)
     resp = yield from client.post('/login')
     assert 200 == resp.status
-    assert resp.url.endswith('/')
+    assert str(resp.url).endswith('/')
     cookies = client.session.cookie_jar.filter_cookies(
         client.make_url('/'))
     assert 'Andrew' == cookies['AIOHTTP_SECURITY'].value
     yield from resp.release()
     resp = yield from client.post('/logout')
     assert 200 == resp.status
-    assert resp.url.endswith('/')
+    assert str(resp.url).endswith('/')
     cookies = client.session.cookie_jar.filter_cookies(
         client.make_url('/'))
     assert 'AIOHTTP_SECURITY' not in cookies

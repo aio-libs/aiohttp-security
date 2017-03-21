@@ -116,14 +116,14 @@ def test_forget(make_app, test_client):
 
     resp = yield from client.post('/login')
     assert 200 == resp.status
-    assert resp.url.endswith('/')
+    assert str(resp.url).endswith('/')
     txt = yield from resp.text()
     assert 'Andrew' == txt
     yield from resp.release()
 
     resp = yield from client.post('/logout')
     assert 200 == resp.status
-    assert resp.url.endswith('/')
+    assert str(resp.url).endswith('/')
     txt = yield from resp.text()
     assert '' == txt
     yield from resp.release()
