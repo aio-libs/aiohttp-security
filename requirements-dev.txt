@@ -1,7 +1,7 @@
 -e .
 flake8==3.3.0
 pytest==3.0.7
-pytest-cov==2.4.0
+pytest-cov==2.5.1
 coverage==4.3.4
 sphinx==1.5.5
 pep257==0.7.0
