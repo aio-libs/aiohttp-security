@@ -12,7 +12,7 @@ the `demo source`_.
     https://github.com/aio-libs/aiohttp_security/tree/master/demo
 
 .. _passlib:
-    https://pythonhosted.org/passlib/
+    https://passlib.readthedocs.io
 
 Database
 --------
