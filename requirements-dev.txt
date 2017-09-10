@@ -6,7 +6,7 @@ coverage==4.3.4
 sphinx==1.6.3
 pep257==0.7.0
 aiohttp-session==1.0.0
-aiopg[sa]==0.13.0
+aiopg[sa]==0.13.1
 aioredis==0.3.3
 hiredis==0.2.0
 passlib==1.7.1
