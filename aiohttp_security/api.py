@@ -1,3 +1,5 @@
+from functools import wraps
+
 import asyncio
 from aiohttp import web
 from aiohttp_security.abc import (AbstractIdentityPolicy,
@@ -5,6 +7,7 @@ from aiohttp_security.abc import (AbstractIdentityPolicy,
 
 IDENTITY_KEY = 'aiohttp_security_identity_policy'
 AUTZ_KEY = 'aiohttp_security_autz_policy'
+AUTZ_REDIRECT_URL = 'aiohttp_security_autz_redirect_url'
 
 
 @asyncio.coroutine
@@ -74,9 +77,29 @@ def permits(request, permission, context=None):
     return access
 
 
-def setup(app, identity_policy, autz_policy):
+def setup(app, identity_policy, autz_policy, redirect_url=None):
     assert isinstance(identity_policy, AbstractIdentityPolicy), identity_policy
     assert isinstance(autz_policy, AbstractAuthorizationPolicy), autz_policy
 
     app[IDENTITY_KEY] = identity_policy
     app[AUTZ_KEY] = autz_policy
+
+    if redirect_url:
+        app[AUTZ_REDIRECT_URL] = redirect_url
+
+
+def login_required(permission):
+    def wrapper(handler):
+        @asyncio.coroutine
+        @wraps(handler)
+        def wrapped(request):
+            has_perm = yield from permits(request, permission)
+            if not has_perm:
+                redirect_url = request.app.get(AUTZ_REDIRECT_URL)
+                if redirect_url:
+                    return web.HTTPFound(redirect_url)
+                raise web.HTTPForbidden()
+            response = yield from handler(request)
+            return response
+        return wrapped
+    return wrapper

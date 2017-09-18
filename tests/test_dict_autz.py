@@ -1,7 +1,7 @@
 import asyncio
 
 from aiohttp import web
-from aiohttp_security import (remember,
+from aiohttp_security import (remember, login_required,
                               authorized_userid, permits,
                               AbstractAuthorizationPolicy)
 from aiohttp_security import setup as _setup
@@ -120,4 +120,53 @@ def test_permits_unauthorized(loop, test_client):
     client = yield from test_client(app)
     resp = yield from client.get('/')
     assert 200 == resp.status
+    yield from resp.release()
+
+
+@asyncio.coroutine
+def test_login_required(loop, test_client):
+
+    @asyncio.coroutine
+    def login(request):
+        response = web.Response()
+        yield from remember(request, response, 'UserID')
+        return response
+
+    @login_required('read')
+    @asyncio.coroutine
+    def check_read(request):
+        return web.Response()
+
+    @login_required('write')
+    @asyncio.coroutine
+    def check_write(request):
+        return web.Response()
+
+    @login_required('unknown')
+    @asyncio.coroutine
+    def check_unknown(request):
+        return web.Response()
+
+    app = web.Application(loop=loop)
+    _setup(app, CookiesIdentityPolicy(), Autz())
+
+    app.router.add_get('/check_read', check_read)
+    app.router.add_get('/check_write', check_write)
+    app.router.add_get('/check_unknown', check_unknown)
+    app.router.add_post('/login', login)
+
+    client = yield from test_client(app)
+
+    resp = yield from client.post('/login')
+    assert 200 == resp.status
+
+    resp = yield from client.get('/check_read')
+    assert 200 == resp.status
+
+    resp = yield from client.get('/check_write')
+    assert 200 == resp.status
+
+    resp = yield from client.get('/check_unknown')
+    assert 403 == resp.status
+
     yield from resp.release()
