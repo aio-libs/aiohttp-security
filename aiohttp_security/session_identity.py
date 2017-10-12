@@ -9,7 +9,7 @@ import asyncio
 try:
     from aiohttp_session import get_session
     has_aiohttp_session = True
-except ImportError:
+except ImportError:  # pragma: no cover
     has_aiohttp_session = False
 
 from .abc import AbstractIdentityPolicy
@@ -20,7 +20,7 @@ class SessionIdentityPolicy(AbstractIdentityPolicy):
     def __init__(self, session_key='AIOHTTP_SECURITY'):
         self._session_key = session_key
 
-        if not has_aiohttp_session:
+        if not has_aiohttp_session:  # pragma: no cover
             raise ImportError(
                 'SessionIdentityPolicy requires `aiohttp_session`')
 
