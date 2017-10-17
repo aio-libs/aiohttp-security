@@ -21,3 +21,14 @@ env:
   matrix:
   - PYTHONASYNCIODEBUG=x
   - PYTHONASYNCIODEBUG=
+
+deploy:
+  provider: pypi
+  user: andrew.svetlov
+  password:
+    secure: "JdBvuOBA/198ognVDOY/qZpIKGXfCx47725kyJo/SpQ3nP+x0GLZb3PMQkR0jfSWWkx6Sisk3vOCYsoWclPyPzp+o4ZpfM8yAjHNFmtbr+k+XJdUEApEiWb6/Y3g7DCyY2Qa/L8IYlyABPWrrJI/nld2sKm5kmhFpR/z3HfeFtINP6Ivp34dUOkeRP6kOvCi9d6GyWnvTRnhlybAnk/Ngrroh8XrbKHdDv0zkQkshF8+pmxVzwao4C6S5ld5cFXIYZHLBA9lNC3zgvOMuFeGPUEN9vab3q77MvaiMIuTC9QjcgIhfw3gabH2u7knqfFzqqzXMaVptx5z8o1JtsxMyYt5NVBqS4NPIljpZjaoS/CASHJlRxniJiYfjvjOtFEcfGMNtZj8ZYsGR0nuP2jwzgpEHHWIs4qL0Y8h9t7pGirxCuQcnY10sr+Y+JKaZNJsugNLgbqE2aaZUye5gjDcEj9WY8kKNZXucLP7c0McJuwPqplDEO4CQouMttcKSYkA0QoETmpAFqaXCaMs3p/glOoU2ZyHSH9mXWir69yo84ymb2NlGPMTAstXlv/g/oLmLMSq7lbl6cSUnO1/wxBGlyfv5AAq/75YUaqsgYofzN5CjUgA3m6NedvbWxLUJaxVQ7nduYGEQKDvGEBmzCNv6CdVRCjQ9J1xX3XzkVheQGc="
+  distributions: "sdist bdist_wheel"
+  on:
+    tags: true
+    all_branches: true
+    python: 3.6
