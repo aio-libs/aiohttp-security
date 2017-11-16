@@ -1,8 +1,7 @@
 import asyncio
 
 from aiohttp import web
-from aiohttp_security import (remember,
-                              authorized_userid, permits,
+from aiohttp_security import (remember, permits, get_user_identity,
                               AbstractAuthorizationPolicy)
 from aiohttp_security import setup as _setup
 from aiohttp_security.cookies_identity import CookiesIdentityPolicy
@@ -17,12 +16,14 @@ class Autz(AbstractAuthorizationPolicy):
         else:
             return False
 
+    '''
     @asyncio.coroutine
     def authorized_userid(self, identity):
         if identity == 'UserID':
             return 'Andrew'
         else:
             return None
+    '''
 
 
 @asyncio.coroutine
@@ -31,12 +32,12 @@ def test_authorized_userid(loop, test_client):
     @asyncio.coroutine
     def login(request):
         response = web.HTTPFound(location='/')
-        yield from remember(request, response, 'UserID')
+        yield from remember(request, response, 'Andrew')
         return response
 
     @asyncio.coroutine
     def check(request):
-        userid = yield from authorized_userid(request)
+        userid = yield from get_user_identity(request)
         assert 'Andrew' == userid
         return web.Response(text=userid)
 
@@ -58,7 +59,7 @@ def test_authorized_userid_not_authorized(loop, test_client):
 
     @asyncio.coroutine
     def check(request):
-        userid = yield from authorized_userid(request)
+        userid = yield from get_user_identity(request)
         assert userid is None
         return web.Response()
 

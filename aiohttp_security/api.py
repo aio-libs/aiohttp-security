@@ -1,10 +1,51 @@
 import asyncio
+import functools
+
 from aiohttp import web
+
 from aiohttp_security.abc import (AbstractIdentityPolicy,
                                   AbstractAuthorizationPolicy)
 
 IDENTITY_KEY = 'aiohttp_security_identity_policy'
 AUTZ_KEY = 'aiohttp_security_autz_policy'
+
+
+def authorize(required=True, redirect_url=None, permission=None):
+    def wrapper(f):
+        @asyncio.coroutine
+        @functools.wraps(f)
+        def wrapped(*args, **kwargs):
+            # assuming first argument is request
+            assert isinstance(args[0], web.Request)
+            request = args[0]
+
+            # check if coroutine
+            if asyncio.iscoroutinefunction(f):
+                coro = f
+            else:
+                coro = asyncio.coroutine(f)
+
+            # get identity
+            identity = yield from authorized_userid(request)
+            kwargs['identity'] = identity
+
+            if required:
+
+                # check identity
+                if not identity:
+                    return web.HTTPFound(redirect_url) if redirect_url \
+                        else web.HTTPForbidden(reason='not authenticated')
+
+                # check permission
+                allowed = yield from permits(request, permission)
+                if permission and not allowed:
+                    return web.HTTPForbidden(reason='unauthorized')
+
+            return (yield from coro(*args, **kwargs))
+
+        return wrapped
+
+    return wrapper
 
 
 @asyncio.coroutine
@@ -50,6 +91,16 @@ def forget(request, response):
 @asyncio.coroutine
 def authorized_userid(request):
     identity_policy = request.app.get(IDENTITY_KEY)
+    if identity_policy is None:
+        return None
+    identity = yield from identity_policy.identify(request)
+    return identity
+
+
+'''
+@asyncio.coroutine
+def authorized_userid(request):
+    identity_policy = request.app.get(IDENTITY_KEY)
     autz_policy = request.app.get(AUTZ_KEY)
     if identity_policy is None or autz_policy is None:
         return None
@@ -58,18 +109,17 @@ def authorized_userid(request):
         return None  # non-registered user has None user_id
     user_id = yield from autz_policy.authorized_userid(identity)
     return user_id
+'''
 
 
 @asyncio.coroutine
 def permits(request, permission, context=None):
     assert isinstance(permission, str), permission
     assert permission
-    identity_policy = request.app.get(IDENTITY_KEY)
     autz_policy = request.app.get(AUTZ_KEY)
-    if identity_policy is None or autz_policy is None:
+    if autz_policy is None:
         return True
-    identity = yield from identity_policy.identify(request)
-    # non-registered user still may has some permissions
+    identity = yield from authorized_userid(request)
     access = yield from autz_policy.permits(identity, permission, context)
     return access
 

@@ -17,10 +17,6 @@ class Autz(AbstractAuthorizationPolicy):
     def permits(self, identity, permission, context=None):
         pass
 
-    @asyncio.coroutine
-    def authorized_userid(self, identity):
-        pass
-
 
 @pytest.fixture
 def make_app(loop):

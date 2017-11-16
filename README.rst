@@ -31,6 +31,13 @@ Develop
 
 ``pip install -r requirements-dev``
 
+.. code-block:: python
+
+  from aiohttp_security import authorize
+  
+  @authorize(required=True, redirect_url='/login', permission='admin')
+  async def index(request, identity=None):
+      return web.Response(body=b'OK')
 
 License
 -------
