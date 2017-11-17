@@ -78,7 +78,7 @@ Public API functions
 
    :param request: :class:`aiohttp.web.Request` object.
 
-   :param str permission: requested :term:`permission`.
+   :param permission: Requested :term:`permission`. :class:`str` or :class:`enum.Enum` object.
 
    :param context: additional object may be passed into
                    :meth:`AbstractAuthorizationPolicy.permission`
@@ -86,6 +86,33 @@ Public API functions
 
    :return: ``True`` if registered user has requested *permission*,
             ``False`` otherwise.
+
+
+.. coroutinefunction:: is_anonymous(request)
+
+   Checks if user is anonymous user.
+
+   Return ``True`` if user is not remembered in request, otherwise returns ``False``.
+
+   :param request: :class:`aiohttp.web.Request` object.
+
+
+.. decorator:: login_required
+
+   Decorator for handlers that checks if user is authorized.
+
+   Raises :class:`aiohttp.web.HTTPUnauthorized` if user is not authorized.
+
+
+.. decorator:: has_permission(permission)
+
+   Decorator for handlers that checks if user is authorized
+   and has correct permission.
+
+   Raises :class:`aiohttp.web.HTTPUnauthorized` if user is not authorized.
+   Raises :class:`aiohttp.web.HTTPForbidden` if user is authorized but has no access rights.
+
+   :param str permission: requested :term:`permission`.
 
 
 .. function:: setup(app, identity_policy, autz_policy)

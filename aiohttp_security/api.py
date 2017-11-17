@@ -1,7 +1,9 @@
 import asyncio
+import enum
 from aiohttp import web
 from aiohttp_security.abc import (AbstractIdentityPolicy,
                                   AbstractAuthorizationPolicy)
+from functools import wraps
 
 IDENTITY_KEY = 'aiohttp_security_identity_policy'
 AUTZ_KEY = 'aiohttp_security_autz_policy'
@@ -62,7 +64,7 @@ def authorized_userid(request):
 
 @asyncio.coroutine
 def permits(request, permission, context=None):
-    assert isinstance(permission, str), permission
+    assert isinstance(permission, (str, enum.Enum)), permission
     assert permission
     identity_policy = request.app.get(IDENTITY_KEY)
     autz_policy = request.app.get(AUTZ_KEY)
@@ -72,6 +74,85 @@ def permits(request, permission, context=None):
     # non-registered user still may has some permissions
     access = yield from autz_policy.permits(identity, permission, context)
     return access
+
+
+@asyncio.coroutine
+def is_anonymous(request):
+    """Check if user is anonymous.
+
+    User is considered anonymous if there is not identity
+    in request.
+    """
+    identity_policy = request.app.get(IDENTITY_KEY)
+    if identity_policy is None:
+        return True
+    identity = yield from identity_policy.identify(request)
+    if identity is None:
+        return True
+    return False
+
+
+def login_required(fn):
+    """Decorator that restrict access only for authorized users.
+
+    User is considered authorized if authorized_userid
+    returns some value.
+    """
+    @asyncio.coroutine
+    @wraps(fn)
+    def wrapped(*args, **kwargs):
+        request = args[-1]
+        if not isinstance(request, web.BaseRequest):
+            msg = ("Incorrect decorator usage. "
+                   "Expecting `def handler(request)` "
+                   "or `def handler(self, request)`.")
+            raise RuntimeError(msg)
+
+        userid = yield from authorized_userid(request)
+        if userid is None:
+            raise web.HTTPUnauthorized
+
+        ret = yield from fn(*args, **kwargs)
+        return ret
+
+    return wrapped
+
+
+def has_permission(
+    permission,
+    context=None,
+):
+    """Decorator that restrict access only for authorized users
+    with correct permissions.
+
+    If user is not authorized - raises HTTPUnauthorized,
+    if user is authorized and does not have permission -
+    raises HTTPForbidden.
+    """
+    def wrapper(fn):
+        @asyncio.coroutine
+        @wraps(fn)
+        def wrapped(*args, **kwargs):
+            request = args[-1]
+            if not isinstance(request, web.BaseRequest):
+                msg = ("Incorrect decorator usage. "
+                       "Expecting `def handler(request)` "
+                       "or `def handler(self, request)`.")
+                raise RuntimeError(msg)
+
+            userid = yield from authorized_userid(request)
+            if userid is None:
+                raise web.HTTPUnauthorized
+
+            allowed = yield from permits(request, permission, context)
+            if not allowed:
+                raise web.HTTPForbidden
+            ret = yield from fn(*args, **kwargs)
+            return ret
+
+        return wrapped
+
+    return wrapper
 
 
 def setup(app, identity_policy, autz_policy):
