@@ -88,6 +88,33 @@ Public API functions
             ``False`` otherwise.
 
 
+.. coroutinefunction:: is_anonymous(request)
+
+   Checks if user is anonymous user.
+
+   Return ``True`` if user is not remembered in request, otherwise returns ``False``.
+
+   :param request: :class:`aiohttp.web.Request` object.
+
+
+.. func:: login_required
+
+   Decorator for handlers that checks if user is authorized.
+
+   Raises `aiohttp.web.HTTPUnauthorized` if user is not authorized.
+
+
+.. coroutinefunction:: has_permission(permission)
+
+   Decorator for handlers that checks if user is authorized
+   and has correct permission.
+
+   Raises `aiohttp.web.HTTPUnauthorized` if user is not authorized.
+   Raises `aiohttp.web.HTTPForbidden` if user is authorized but has no access rights.
+
+   :param str permission: requested :term:`permission`.
+
+
 .. function:: setup(app, identity_policy, autz_policy)
 
    Setup :mod:`aiohttp` application with security policies.
