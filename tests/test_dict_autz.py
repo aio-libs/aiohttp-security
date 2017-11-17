@@ -1,4 +1,5 @@
 import asyncio
+import enum
 
 from aiohttp import web
 from aiohttp_security import (remember, is_anonymous, login_required, has_permission, forget,
@@ -73,7 +74,27 @@ def test_authorized_userid_not_authorized(loop, test_client):
 
 
 @asyncio.coroutine
-def test_permits(loop, test_client):
+def test_permits_enum_permission(loop, test_client):
+    class Permission(enum.Enum):
+        READ = '101'
+        WRITE = '102'
+        UNKNOWN = '103'
+
+    class Autz(AbstractAuthorizationPolicy):
+
+        @asyncio.coroutine
+        def permits(self, identity, permission, context=None):
+            if identity == 'UserID':
+                return permission in {Permission.READ, Permission.WRITE}
+            else:
+                return False
+
+        @asyncio.coroutine
+        def authorized_userid(self, identity):
+            if identity == 'UserID':
+                return 'Andrew'
+            else:
+                return None
 
     @asyncio.coroutine
     def login(request):
@@ -83,11 +104,11 @@ def test_permits(loop, test_client):
 
     @asyncio.coroutine
     def check(request):
-        ret = yield from permits(request, 'read')
+        ret = yield from permits(request, Permission.READ)
         assert ret
-        ret = yield from permits(request, 'write')
+        ret = yield from permits(request, Permission.WRITE)
         assert ret
-        ret = yield from permits(request, 'unknown')
+        ret = yield from permits(request, Permission.UNKNOWN)
         assert not ret
         return web.Response()
 

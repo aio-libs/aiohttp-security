@@ -1,4 +1,5 @@
 import asyncio
+import enum
 from aiohttp import web
 from aiohttp_security.abc import (AbstractIdentityPolicy,
                                   AbstractAuthorizationPolicy)
@@ -63,7 +64,7 @@ def authorized_userid(request):
 
 @asyncio.coroutine
 def permits(request, permission, context=None):
-    assert isinstance(permission, str), permission
+    assert isinstance(permission, (str, enum.Enum)), permission
     assert permission
     identity_policy = request.app.get(IDENTITY_KEY)
     autz_policy = request.app.get(AUTZ_KEY)
@@ -102,9 +103,9 @@ def login_required(fn):
     def wrapped(*args, **kwargs):
         request = args[-1]
         if not isinstance(request, web.BaseRequest):
-            msg = 'Incorrect decorator usage. ' \
-                  'Expecting `def handler(request)` ' \
-                  'or `def handler(self, request)`.'
+            msg = ("Incorrect decorator usage. "
+                   "Expecting `def handler(request)` "
+                   "or `def handler(self, request)`.")
             raise RuntimeError(msg)
 
         userid = yield from authorized_userid(request)
@@ -134,9 +135,9 @@ def has_permission(
         def wrapped(*args, **kwargs):
             request = args[-1]
             if not isinstance(request, web.BaseRequest):
-                msg = 'Incorrect decorator usage. ' \
-                      'Expecting `def handler(request)` ' \
-                      'or `def handler(self, request)`.'
+                msg = ("Incorrect decorator usage. "
+                       "Expecting `def handler(request)` "
+                       "or `def handler(self, request)`.")
                 raise RuntimeError(msg)
 
             userid = yield from authorized_userid(request)
