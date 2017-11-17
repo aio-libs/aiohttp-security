@@ -2,10 +2,10 @@ import asyncio
 import enum
 
 from aiohttp import web
-from aiohttp_security import (remember, is_anonymous, login_required, has_permission, forget,
-                              authorized_userid, permits,
-                              AbstractAuthorizationPolicy)
 from aiohttp_security import setup as _setup
+from aiohttp_security import (AbstractAuthorizationPolicy, authorized_userid,
+                              forget, has_permission, is_anonymous,
+                              login_required, permits, remember)
 from aiohttp_security.cookies_identity import CookiesIdentityPolicy
 
 
