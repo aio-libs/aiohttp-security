@@ -1,6 +1,11 @@
 Changes
 =======
 
+0.2.0 (2017-11-17)
+------------------
+
+- Add `is_anonymous`, `login_required`, `has_permission` helpers (#114)
+
 0.1.2 (2017-10-17)
 ------------------
 

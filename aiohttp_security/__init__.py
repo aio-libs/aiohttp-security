@@ -4,7 +4,7 @@ from .api import (authorized_userid, forget, has_permission, is_anonymous,
 from .cookies_identity import CookiesIdentityPolicy
 from .session_identity import SessionIdentityPolicy
 
-__version__ = '0.1.2'
+__version__ = '0.2.0'
 
 
 __all__ = ('AbstractIdentityPolicy', 'AbstractAuthorizationPolicy',
