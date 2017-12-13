@@ -1,4 +1,3 @@
-import asyncio
 import enum
 from aiohttp import web
 from aiohttp_security.abc import (AbstractIdentityPolicy,
@@ -9,8 +8,7 @@ IDENTITY_KEY = 'aiohttp_security_identity_policy'
 AUTZ_KEY = 'aiohttp_security_autz_policy'
 
 
-@asyncio.coroutine
-def remember(request, response, identity, **kwargs):
+async def remember(request, response, identity, **kwargs):
     """Remember identity into response.
 
     The action is performed by identity_policy.remember()
@@ -28,11 +26,10 @@ def remember(request, response, identity, **kwargs):
         # output and rendered page we add same message to *reason* and
         # *text* arguments.
         raise web.HTTPInternalServerError(reason=text, text=text)
-    yield from identity_policy.remember(request, response, identity, **kwargs)
+    await identity_policy.remember(request, response, identity, **kwargs)
 
 
-@asyncio.coroutine
-def forget(request, response):
+async def forget(request, response):
     """Forget previously remembered identity.
 
     Usually it clears cookie or server-side storage to forget user
@@ -46,38 +43,35 @@ def forget(request, response):
         # output and rendered page we add same message to *reason* and
         # *text* arguments.
         raise web.HTTPInternalServerError(reason=text, text=text)
-    yield from identity_policy.forget(request, response)
+    await identity_policy.forget(request, response)
 
 
-@asyncio.coroutine
-def authorized_userid(request):
+async def authorized_userid(request):
     identity_policy = request.app.get(IDENTITY_KEY)
     autz_policy = request.app.get(AUTZ_KEY)
     if identity_policy is None or autz_policy is None:
         return None
-    identity = yield from identity_policy.identify(request)
+    identity = await identity_policy.identify(request)
     if identity is None:
         return None  # non-registered user has None user_id
-    user_id = yield from autz_policy.authorized_userid(identity)
+    user_id = await autz_policy.authorized_userid(identity)
     return user_id
 
 
-@asyncio.coroutine
-def permits(request, permission, context=None):
+async def permits(request, permission, context=None):
     assert isinstance(permission, (str, enum.Enum)), permission
     assert permission
     identity_policy = request.app.get(IDENTITY_KEY)
     autz_policy = request.app.get(AUTZ_KEY)
     if identity_policy is None or autz_policy is None:
         return True
-    identity = yield from identity_policy.identify(request)
+    identity = await identity_policy.identify(request)
     # non-registered user still may has some permissions
-    access = yield from autz_policy.permits(identity, permission, context)
+    access = await autz_policy.permits(identity, permission, context)
     return access
 
 
-@asyncio.coroutine
-def is_anonymous(request):
+async def is_anonymous(request):
     """Check if user is anonymous.
 
     User is considered anonymous if there is not identity
@@ -86,7 +80,7 @@ def is_anonymous(request):
     identity_policy = request.app.get(IDENTITY_KEY)
     if identity_policy is None:
         return True
-    identity = yield from identity_policy.identify(request)
+    identity = await identity_policy.identify(request)
     if identity is None:
         return True
     return False
@@ -98,9 +92,8 @@ def login_required(fn):
     User is considered authorized if authorized_userid
     returns some value.
     """
-    @asyncio.coroutine
     @wraps(fn)
-    def wrapped(*args, **kwargs):
+    async def wrapped(*args, **kwargs):
         request = args[-1]
         if not isinstance(request, web.BaseRequest):
             msg = ("Incorrect decorator usage. "
@@ -108,11 +101,11 @@ def login_required(fn):
                    "or `def handler(self, request)`.")
             raise RuntimeError(msg)
 
-        userid = yield from authorized_userid(request)
+        userid = await authorized_userid(request)
         if userid is None:
             raise web.HTTPUnauthorized
 
-        ret = yield from fn(*args, **kwargs)
+        ret = await fn(*args, **kwargs)
         return ret
 
     return wrapped
@@ -130,9 +123,8 @@ def has_permission(
     raises HTTPForbidden.
     """
     def wrapper(fn):
-        @asyncio.coroutine
         @wraps(fn)
-        def wrapped(*args, **kwargs):
+        async def wrapped(*args, **kwargs):
             request = args[-1]
             if not isinstance(request, web.BaseRequest):
                 msg = ("Incorrect decorator usage. "
@@ -140,14 +132,14 @@ def has_permission(
                        "or `def handler(self, request)`.")
                 raise RuntimeError(msg)
 
-            userid = yield from authorized_userid(request)
+            userid = await authorized_userid(request)
             if userid is None:
                 raise web.HTTPUnauthorized
 
-            allowed = yield from permits(request, permission, context)
+            allowed = await permits(request, permission, context)
             if not allowed:
                 raise web.HTTPForbidden
-            ret = yield from fn(*args, **kwargs)
+            ret = await fn(*args, **kwargs)
             return ret
 
         return wrapped

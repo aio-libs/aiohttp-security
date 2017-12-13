@@ -4,8 +4,6 @@ aiohttp_session.setup() should be called on application initialization
 to configure aiohttp_session properly.
 """
 
-import asyncio
-
 try:
     from aiohttp_session import get_session
     HAS_AIOHTTP_SESSION = True
@@ -24,17 +22,14 @@ class SessionIdentityPolicy(AbstractIdentityPolicy):
             raise ImportError(
                 'SessionIdentityPolicy requires `aiohttp_session`')
 
-    @asyncio.coroutine
-    def identify(self, request):
-        session = yield from get_session(request)
+    async def identify(self, request):
+        session = await get_session(request)
         return session.get(self._session_key)
 
-    @asyncio.coroutine
-    def remember(self, request, response, identity, **kwargs):
-        session = yield from get_session(request)
+    async def remember(self, request, response, identity, **kwargs):
+        session = await get_session(request)
         session[self._session_key] = identity
 
-    @asyncio.coroutine
-    def forget(self, request, response):
-        session = yield from get_session(request)
+    async def forget(self, request, response):
+        session = await get_session(request)
         session.pop(self._session_key, None)

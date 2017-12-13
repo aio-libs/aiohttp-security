@@ -1,4 +1,3 @@
-import asyncio
 import pytest
 
 from aiohttp import web
@@ -13,12 +12,10 @@ from aiohttp_session import setup as setup_session
 
 class Autz(AbstractAuthorizationPolicy):
 
-    @asyncio.coroutine
-    def permits(self, identity, permission, context=None):
+    async def permits(self, identity, permission, context=None):
         pass
 
-    @asyncio.coroutine
-    def authorized_userid(self, identity):
+    async def authorized_userid(self, identity):
         pass
 
 
@@ -30,81 +27,67 @@ def make_app(loop):
     return app
 
 
-@asyncio.coroutine
-def test_remember(make_app, test_client):
+async def test_remember(make_app, test_client):
 
-    @asyncio.coroutine
-    def handler(request):
+    async def handler(request):
         response = web.Response()
-        yield from remember(request, response, 'Andrew')
+        await remember(request, response, 'Andrew')
         return response
 
-    @asyncio.coroutine
-    def check(request):
-        session = yield from get_session(request)
+    async def check(request):
+        session = await get_session(request)
         assert session['AIOHTTP_SECURITY'] == 'Andrew'
         return web.HTTPOk()
 
     app = make_app()
     app.router.add_route('GET', '/', handler)
     app.router.add_route('GET', '/check', check)
-    client = yield from test_client(app)
-    resp = yield from client.get('/')
+    client = await test_client(app)
+    resp = await client.get('/')
     assert 200 == resp.status
-    yield from resp.release()
 
-    resp = yield from client.get('/check')
+    resp = await client.get('/check')
     assert 200 == resp.status
-    yield from resp.release()
 
 
-@asyncio.coroutine
-def test_identify(make_app, test_client):
+async def test_identify(make_app, test_client):
 
-    @asyncio.coroutine
-    def create(request):
+    async def create(request):
         response = web.Response()
-        yield from remember(request, response, 'Andrew')
+        await remember(request, response, 'Andrew')
         return response
 
-    @asyncio.coroutine
-    def check(request):
+    async def check(request):
         policy = request.app[IDENTITY_KEY]
-        user_id = yield from policy.identify(request)
+        user_id = await policy.identify(request)
         assert 'Andrew' == user_id
         return web.Response()
 
     app = make_app()
     app.router.add_route('GET', '/', check)
     app.router.add_route('POST', '/', create)
-    client = yield from test_client(app)
-    resp = yield from client.post('/')
+    client = await test_client(app)
+    resp = await client.post('/')
     assert 200 == resp.status
-    yield from resp.release()
 
-    resp = yield from client.get('/')
+    resp = await client.get('/')
     assert 200 == resp.status
-    yield from resp.release()
 
 
-@asyncio.coroutine
-def test_forget(make_app, test_client):
+async def test_forget(make_app, test_client):
 
-    @asyncio.coroutine
-    def index(request):
-        session = yield from get_session(request)
+    async def index(request):
+        session = await get_session(request)
         return web.HTTPOk(text=session.get('AIOHTTP_SECURITY', ''))
 
-    @asyncio.coroutine
-    def login(request):
+    async def login(request):
         response = web.HTTPFound(location='/')
-        yield from remember(request, response, 'Andrew')
+        await remember(request, response, 'Andrew')
         return response
 
-    @asyncio.coroutine
-    def logout(request):
+    async def logout(request):
         response = web.HTTPFound('/')
-        yield from forget(request, response)
+        await forget(request, response)
         return response
 
     app = make_app()
@@ -112,18 +95,16 @@ def test_forget(make_app, test_client):
     app.router.add_route('POST', '/login', login)
     app.router.add_route('POST', '/logout', logout)
 
-    client = yield from test_client(app)
+    client = await test_client(app)
 
-    resp = yield from client.post('/login')
+    resp = await client.post('/login')
     assert 200 == resp.status
     assert str(resp.url).endswith('/')
-    txt = yield from resp.text()
+    txt = await resp.text()
     assert 'Andrew' == txt
-    yield from resp.release()
 
-    resp = yield from client.post('/logout')
+    resp = await client.post('/logout')
     assert 200 == resp.status
     assert str(resp.url).endswith('/')
-    txt = yield from resp.text()
+    txt = await resp.text()
     assert '' == txt
-    yield from resp.release()

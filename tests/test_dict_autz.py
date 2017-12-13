@@ -1,4 +1,3 @@
-import asyncio
 import enum
 
 from aiohttp import web
@@ -11,33 +10,28 @@ from aiohttp_security.cookies_identity import CookiesIdentityPolicy
 
 class Autz(AbstractAuthorizationPolicy):
 
-    @asyncio.coroutine
-    def permits(self, identity, permission, context=None):
+    async def permits(self, identity, permission, context=None):
         if identity == 'UserID':
             return permission in {'read', 'write'}
         else:
             return False
 
-    @asyncio.coroutine
-    def authorized_userid(self, identity):
+    async def authorized_userid(self, identity):
         if identity == 'UserID':
             return 'Andrew'
         else:
             return None
 
 
-@asyncio.coroutine
-def test_authorized_userid(loop, test_client):
+async def test_authorized_userid(loop, test_client):
 
-    @asyncio.coroutine
-    def login(request):
+    async def login(request):
         response = web.HTTPFound(location='/')
-        yield from remember(request, response, 'UserID')
+        await remember(request, response, 'UserID')
         return response
 
-    @asyncio.coroutine
-    def check(request):
-        userid = yield from authorized_userid(request)
+    async def check(request):
+        userid = await authorized_userid(request)
         assert 'Andrew' == userid
         return web.Response(text=userid)
 
@@ -45,36 +39,31 @@ def test_authorized_userid(loop, test_client):
     _setup(app, CookiesIdentityPolicy(), Autz())
     app.router.add_route('GET', '/', check)
     app.router.add_route('POST', '/login', login)
-    client = yield from test_client(app)
+    client = await test_client(app)
 
-    resp = yield from client.post('/login')
+    resp = await client.post('/login')
     assert 200 == resp.status
-    txt = yield from resp.text()
+    txt = await resp.text()
     assert 'Andrew' == txt
-    yield from resp.release()
 
 
-@asyncio.coroutine
-def test_authorized_userid_not_authorized(loop, test_client):
+async def test_authorized_userid_not_authorized(loop, test_client):
 
-    @asyncio.coroutine
-    def check(request):
-        userid = yield from authorized_userid(request)
+    async def check(request):
+        userid = await authorized_userid(request)
         assert userid is None
         return web.Response()
 
     app = web.Application(loop=loop)
     _setup(app, CookiesIdentityPolicy(), Autz())
     app.router.add_route('GET', '/', check)
-    client = yield from test_client(app)
+    client = await test_client(app)
 
-    resp = yield from client.get('/')
+    resp = await client.get('/')
     assert 200 == resp.status
-    yield from resp.release()
 
 
-@asyncio.coroutine
-def test_permits_enum_permission(loop, test_client):
+async def test_permits_enum_permission(loop, test_client):
     class Permission(enum.Enum):
         READ = '101'
         WRITE = '102'
@@ -82,33 +71,29 @@ def test_permits_enum_permission(loop, test_client):
 
     class Autz(AbstractAuthorizationPolicy):
 
-        @asyncio.coroutine
-        def permits(self, identity, permission, context=None):
+        async def permits(self, identity, permission, context=None):
             if identity == 'UserID':
                 return permission in {Permission.READ, Permission.WRITE}
             else:
                 return False
 
-        @asyncio.coroutine
-        def authorized_userid(self, identity):
+        async def authorized_userid(self, identity):
             if identity == 'UserID':
                 return 'Andrew'
             else:
                 return None
 
-    @asyncio.coroutine
-    def login(request):
+    async def login(request):
         response = web.HTTPFound(location='/')
-        yield from remember(request, response, 'UserID')
+        await remember(request, response, 'UserID')
         return response
 
-    @asyncio.coroutine
-    def check(request):
-        ret = yield from permits(request, Permission.READ)
+    async def check(request):
+        ret = await permits(request, Permission.READ)
         assert ret
-        ret = yield from permits(request, Permission.WRITE)
+        ret = await permits(request, Permission.WRITE)
         assert ret
-        ret = yield from permits(request, Permission.UNKNOWN)
+        ret = await permits(request, Permission.UNKNOWN)
         assert not ret
         return web.Response()
 
@@ -116,54 +101,46 @@ def test_permits_enum_permission(loop, test_client):
     _setup(app, CookiesIdentityPolicy(), Autz())
     app.router.add_route('GET', '/', check)
     app.router.add_route('POST', '/login', login)
-    client = yield from test_client(app)
-    resp = yield from client.post('/login')
+    client = await test_client(app)
+    resp = await client.post('/login')
     assert 200 == resp.status
-    yield from resp.release()
 
 
-@asyncio.coroutine
-def test_permits_unauthorized(loop, test_client):
+async def test_permits_unauthorized(loop, test_client):
 
-    @asyncio.coroutine
-    def check(request):
-        ret = yield from permits(request, 'read')
+    async def check(request):
+        ret = await permits(request, 'read')
         assert not ret
-        ret = yield from permits(request, 'write')
+        ret = await permits(request, 'write')
         assert not ret
-        ret = yield from permits(request, 'unknown')
+        ret = await permits(request, 'unknown')
         assert not ret
         return web.Response()
 
     app = web.Application(loop=loop)
     _setup(app, CookiesIdentityPolicy(), Autz())
     app.router.add_route('GET', '/', check)
-    client = yield from test_client(app)
-    resp = yield from client.get('/')
+    client = await test_client(app)
+    resp = await client.get('/')
     assert 200 == resp.status
-    yield from resp.release()
 
 
-@asyncio.coroutine
-def test_is_anonymous(loop, test_client):
+async def test_is_anonymous(loop, test_client):
 
-    @asyncio.coroutine
-    def index(request):
-        is_anon = yield from is_anonymous(request)
+    async def index(request):
+        is_anon = await is_anonymous(request)
         if is_anon:
             return web.HTTPUnauthorized()
         return web.HTTPOk()
 
-    @asyncio.coroutine
-    def login(request):
+    async def login(request):
         response = web.HTTPFound(location='/')
-        yield from remember(request, response, 'UserID')
+        await remember(request, response, 'UserID')
         return response
 
-    @asyncio.coroutine
-    def logout(request):
+    async def logout(request):
         response = web.HTTPFound(location='/')
-        yield from forget(request, response)
+        await forget(request, response)
         return response
 
     app = web.Application(loop=loop)
@@ -171,36 +148,32 @@ def test_is_anonymous(loop, test_client):
     app.router.add_route('GET', '/', index)
     app.router.add_route('POST', '/login', login)
     app.router.add_route('POST', '/logout', logout)
-    client = yield from test_client(app)
-    resp = yield from client.get('/')
+    client = await test_client(app)
+    resp = await client.get('/')
     assert web.HTTPUnauthorized.status_code == resp.status
 
-    yield from client.post('/login')
-    resp = yield from client.get('/')
+    await client.post('/login')
+    resp = await client.get('/')
     assert web.HTTPOk.status_code == resp.status
 
-    yield from client.post('/logout')
-    resp = yield from client.get('/')
+    await client.post('/logout')
+    resp = await client.get('/')
     assert web.HTTPUnauthorized.status_code == resp.status
 
 
-@asyncio.coroutine
-def test_login_required(loop, test_client):
+async def test_login_required(loop, test_client):
     @login_required
-    @asyncio.coroutine
-    def index(request):
+    async def index(request):
         return web.HTTPOk()
 
-    @asyncio.coroutine
-    def login(request):
+    async def login(request):
         response = web.HTTPFound(location='/')
-        yield from remember(request, response, 'UserID')
+        await remember(request, response, 'UserID')
         return response
 
-    @asyncio.coroutine
-    def logout(request):
+    async def logout(request):
         response = web.HTTPFound(location='/')
-        yield from forget(request, response)
+        await forget(request, response)
         return response
 
     app = web.Application(loop=loop)
@@ -208,47 +181,41 @@ def test_login_required(loop, test_client):
     app.router.add_route('GET', '/', index)
     app.router.add_route('POST', '/login', login)
     app.router.add_route('POST', '/logout', logout)
-    client = yield from test_client(app)
-    resp = yield from client.get('/')
+    client = await test_client(app)
+    resp = await client.get('/')
     assert web.HTTPUnauthorized.status_code == resp.status
 
-    yield from client.post('/login')
-    resp = yield from client.get('/')
+    await client.post('/login')
+    resp = await client.get('/')
     assert web.HTTPOk.status_code == resp.status
 
-    yield from client.post('/logout')
-    resp = yield from client.get('/')
+    await client.post('/logout')
+    resp = await client.get('/')
     assert web.HTTPUnauthorized.status_code == resp.status
 
 
-@asyncio.coroutine
-def test_has_permission(loop, test_client):
+async def test_has_permission(loop, test_client):
 
     @has_permission('read')
-    @asyncio.coroutine
-    def index_read(request):
+    async def index_read(request):
         return web.HTTPOk()
 
     @has_permission('write')
-    @asyncio.coroutine
-    def index_write(request):
+    async def index_write(request):
         return web.HTTPOk()
 
     @has_permission('forbid')
-    @asyncio.coroutine
-    def index_forbid(request):
+    async def index_forbid(request):
         return web.HTTPOk()
 
-    @asyncio.coroutine
-    def login(request):
+    async def login(request):
         response = web.HTTPFound(location='/')
-        yield from remember(request, response, 'UserID')
+        await remember(request, response, 'UserID')
         return response
 
-    @asyncio.coroutine
-    def logout(request):
+    async def logout(request):
         response = web.HTTPFound(location='/')
-        yield from forget(request, response)
+        await forget(request, response)
         return response
 
     app = web.Application(loop=loop)
@@ -258,27 +225,27 @@ def test_has_permission(loop, test_client):
     app.router.add_route('GET', '/permission/forbid', index_forbid)
     app.router.add_route('POST', '/login', login)
     app.router.add_route('POST', '/logout', logout)
-    client = yield from test_client(app)
+    client = await test_client(app)
 
-    resp = yield from client.get('/permission/read')
+    resp = await client.get('/permission/read')
     assert web.HTTPUnauthorized.status_code == resp.status
-    resp = yield from client.get('/permission/write')
+    resp = await client.get('/permission/write')
     assert web.HTTPUnauthorized.status_code == resp.status
-    resp = yield from client.get('/permission/forbid')
+    resp = await client.get('/permission/forbid')
     assert web.HTTPUnauthorized.status_code == resp.status
 
-    yield from client.post('/login')
-    resp = yield from client.get('/permission/read')
+    await client.post('/login')
+    resp = await client.get('/permission/read')
     assert web.HTTPOk.status_code == resp.status
-    resp = yield from client.get('/permission/write')
+    resp = await client.get('/permission/write')
     assert web.HTTPOk.status_code == resp.status
-    resp = yield from client.get('/permission/forbid')
+    resp = await client.get('/permission/forbid')
     assert web.HTTPForbidden.status_code == resp.status
 
-    yield from client.post('/logout')
-    resp = yield from client.get('/permission/read')
+    await client.post('/logout')
+    resp = await client.get('/permission/read')
     assert web.HTTPUnauthorized.status_code == resp.status
-    resp = yield from client.get('/permission/write')
+    resp = await client.get('/permission/write')
     assert web.HTTPUnauthorized.status_code == resp.status
-    resp = yield from client.get('/permission/forbid')
+    resp = await client.get('/permission/forbid')
     assert web.HTTPUnauthorized.status_code == resp.status
