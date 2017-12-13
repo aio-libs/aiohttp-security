@@ -13,10 +13,9 @@ from demo.db_auth import DBAuthorizationPolicy
 from demo.handlers import Web
 
 
-@asyncio.coroutine
 def init(loop):
-    redis_pool = yield from create_pool(('localhost', 6379))
-    db_engine = yield from create_engine(user='aiohttp_security',
+    redis_pool = await create_pool(('localhost', 6379))
+    db_engine = await create_engine(user='aiohttp_security',
                                          password='aiohttp_security',
                                          database='aiohttp_security',
                                          host='127.0.0.1')
@@ -31,21 +30,20 @@ def init(loop):
     web_handlers.configure(app)
 
     handler = app.make_handler()
-    srv = yield from loop.create_server(handler, '127.0.0.1', 8080)
+    srv = await loop.create_server(handler, '127.0.0.1', 8080)
     print('Server started at http://127.0.0.1:8080')
     return srv, app, handler
 
 
-@asyncio.coroutine
-def finalize(srv, app, handler):
+async def finalize(srv, app, handler):
     sock = srv.sockets[0]
     app.loop.remove_reader(sock.fileno())
     sock.close()
 
-    yield from handler.finish_connections(1.0)
+    await handler.finish_connections(1.0)
     srv.close()
-    yield from srv.wait_closed()
-    yield from app.finish()
+    await srv.wait_closed()
+    await app.finish()
 
 
 def main():

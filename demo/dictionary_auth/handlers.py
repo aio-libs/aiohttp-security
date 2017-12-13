@@ -1,4 +1,3 @@
-import asyncio
 import functools
 from textwrap import dedent
 
@@ -11,14 +10,13 @@ from .authz import check_credentials
 
 def require(permission):
     def wrapper(f):
-        @asyncio.coroutine
         @functools.wraps(f)
-        def wrapped(request):
-            has_perm = yield from permits(request, permission)
+        async def wrapped(request):
+            has_perm = await permits(request, permission)
             if not has_perm:
                 message = 'User has no permission {}'.format(permission)
                 raise web.HTTPForbidden(body=message.encode())
-            return (yield from f(request))
+            return await f(request)
         return wrapped
     return wrapper
 

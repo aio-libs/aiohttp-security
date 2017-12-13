@@ -67,13 +67,12 @@ In our example we will lookup database by user login and if present return
 this identity::
 
 
-    @asyncio.coroutine
-    def authorized_userid(self, identity):
-        with (yield from self.dbengine) as conn:
+    async def authorized_userid(self, identity):
+        async with  self.dbengine as conn:
             where = sa.and_(db.users.c.login == identity,
                             sa.not_(db.users.c.disabled))
             query = db.users.count().where(where)
-            ret = yield from conn.scalar(query)
+            ret = await conn.scalar(query)
             if ret:
                 return identity
             else:
@@ -84,17 +83,16 @@ For permission check we will fetch the user first, check if he is superuser
 (all permissions are allowed), otherwise check if permission is explicitly set
 for that user::
 
-    @asyncio.coroutine
-    def permits(self, identity, permission, context=None):
+    async def permits(self, identity, permission, context=None):
         if identity is None:
             return False
 
-        with (yield from self.dbengine) as conn:
+        async with self.dbengine as conn:
             where = sa.and_(db.users.c.login == identity,
                             sa.not_(db.users.c.disabled))
             query = db.users.select().where(where)
-            ret = yield from conn.execute(query)
-            user = yield from ret.fetchone()
+            ret = await conn.execute(query)
+            user = await ret.fetchone()
             if user is not None:
                 user_id = user[0]
                 is_superuser = user[4]
@@ -103,8 +101,8 @@ for that user::
 
                 where = db.permissions.c.user_id == user_id
                 query = db.permissions.select().where(where)
-                ret = yield from conn.execute(query)
-                result = yield from ret.fetchall()
+                ret = await conn.execute(query)
+                result = await ret.fetchall()
                 if ret is not None:
                     for record in result:
                         if record.perm_name == permission:
@@ -127,13 +125,12 @@ Once we have all the code in place we can install it for our application::
     from .db_auth import DBAuthorizationPolicy
 
 
-    @asyncio.coroutine
-    def init(loop):
-        redis_pool = yield from create_pool(('localhost', 6379))
-        dbengine = yield from create_engine(user='aiohttp_security',
-                                            password='aiohttp_security',
-                                            database='aiohttp_security',
-                                            host='127.0.0.1')
+    async def init(loop):
+        redis_pool = await create_pool(('localhost', 6379))
+        dbengine = await create_engine(user='aiohttp_security',
+                                       password='aiohttp_security',
+                                       database='aiohttp_security',
+                                       host='127.0.0.1')
         app = web.Application(loop=loop)
         setup_session(app, RedisStorage(redis_pool))
         setup_security(app,
@@ -148,14 +145,13 @@ help to do that::
 
     def require(permission):
         def wrapper(f):
-            @asyncio.coroutine
             @functools.wraps(f)
-            def wrapped(self, request):
-                has_perm = yield from permits(request, permission)
+            async def wrapped(self, request):
+                has_perm = await permits(request, permission)
                 if not has_perm:
                     message = 'User has no permission {}'.format(permission)
                     raise web.HTTPForbidden(body=message.encode())
-                return (yield from f(self, request))
+                return await f(self, request)
             return wrapped
         return wrapper
 
@@ -164,8 +160,7 @@ For each view you need to protect just apply the decorator on it::
 
     class Web:
         @require('protected')
-        @asyncio.coroutine
-        def protected_page(self, request):
+        async def protected_page(self, request):
             response = web.Response(body=b'You are on protected page')
             return response
 
@@ -187,14 +182,13 @@ function may do what you trying to accomplish::
 
     from passlib.hash import sha256_crypt
 
-    @asyncio.coroutine
-    def check_credentials(db_engine, username, password):
-        with (yield from db_engine) as conn:
+    async def check_credentials(db_engine, username, password):
+        async with  db_engine as conn:
             where = sa.and_(db.users.c.login == username,
                             sa.not_(db.users.c.disabled))
             query = db.users.select().where(where)
-            ret = yield from conn.execute(query)
-            user = yield from ret.fetchone()
+            ret = await conn.execute(query)
+            user = await ret.fetchone()
             if user is not None:
                 hash = user[2]
                 return sha256_crypt.verify(password, hash)

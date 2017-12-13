@@ -1,5 +1,3 @@
-import asyncio
-
 import sqlalchemy as sa
 
 from aiohttp_security.abc import AbstractAuthorizationPolicy
@@ -12,29 +10,27 @@ class DBAuthorizationPolicy(AbstractAuthorizationPolicy):
     def __init__(self, dbengine):
         self.dbengine = dbengine
 
-    @asyncio.coroutine
     def authorized_userid(self, identity):
-        with (yield from self.dbengine) as conn:
+        async with self.dbengine as conn:
             where = sa.and_(db.users.c.login == identity,
                             sa.not_(db.users.c.disabled))
             query = db.users.count().where(where)
-            ret = yield from conn.scalar(query)
+            ret = await conn.scalar(query)
             if ret:
                 return identity
             else:
                 return None
 
-    @asyncio.coroutine
-    def permits(self, identity, permission, context=None):
+    async def permits(self, identity, permission, context=None):
         if identity is None:
             return False
 
-        with (yield from self.dbengine) as conn:
+        async with self.dbengine as conn:
             where = sa.and_(db.users.c.login == identity,
                             sa.not_(db.users.c.disabled))
             query = db.users.select().where(where)
-            ret = yield from conn.execute(query)
-            user = yield from ret.fetchone()
+            ret = await conn.execute(query)
+            user = await ret.fetchone()
             if user is not None:
                 user_id = user[0]
                 is_superuser = user[3]
@@ -43,8 +39,8 @@ class DBAuthorizationPolicy(AbstractAuthorizationPolicy):
 
                 where = db.permissions.c.user_id == user_id
                 query = db.permissions.select().where(where)
-                ret = yield from conn.execute(query)
-                result = yield from ret.fetchall()
+                ret = await conn.execute(query)
+                result = await ret.fetchall()
                 if ret is not None:
                     for record in result:
                         if record.perm_name == permission:
@@ -53,14 +49,13 @@ class DBAuthorizationPolicy(AbstractAuthorizationPolicy):
             return False
 
 
-@asyncio.coroutine
-def check_credentials(db_engine, username, password):
-    with (yield from db_engine) as conn:
+async def check_credentials(db_engine, username, password):
+    async with db_engine as conn:
         where = sa.and_(db.users.c.login == username,
                         sa.not_(db.users.c.disabled))
         query = db.users.select().where(where)
-        ret = yield from conn.execute(query)
-        user = yield from ret.fetchone()
+        ret = await conn.execute(query)
+        user = await ret.fetchone()
         if user is not None:
             hash = user[2]
             return sha256_crypt.verify(password, hash)
