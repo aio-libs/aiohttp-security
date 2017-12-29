@@ -10,7 +10,7 @@ class DBAuthorizationPolicy(AbstractAuthorizationPolicy):
     def __init__(self, dbengine):
         self.dbengine = dbengine
 
-    def authorized_userid(self, identity):
+    async def authorized_userid(self, identity):
         async with self.dbengine as conn:
             where = sa.and_(db.users.c.login == identity,
                             sa.not_(db.users.c.disabled))
