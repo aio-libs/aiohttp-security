@@ -9,17 +9,31 @@ aiohttp_security
 .. image:: https://img.shields.io/pypi/v/aiohttp-security.svg
     :target: https://pypi.python.org/pypi/aiohttp-security
 
-The library provides identity and autorization for `aiohttp.web`__.
+The library provides identity and authorization for `aiohttp.web`__.
 
 .. _aiohttp_web: http://aiohttp.readthedocs.org/en/latest/web.html
 
 __ aiohttp_web_
 
-Usage
------
-To install type ``pip install aiohttp_security``.
-Launch ``make doc`` and see examples or look under **demo** directory for a
-sample project.
+Installation
+------------
+Simplest case (authorization via cookies) ::
+
+    $ pip install aiohttp_security
+
+With `aiohttp-session` support ::
+
+    $ pip install aiohttp_security[session]
+
+Examples
+--------
+Take a look at examples:
+
+:ref:`aiohttp-security-example`
+
+:ref:`aiohttp-security-example-db-auth`
+
+and demos at **demo** directory.
 
 Documentation
 -------------

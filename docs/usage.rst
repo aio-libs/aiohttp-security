@@ -13,6 +13,10 @@ First of all, what is *aiohttp_security* about?
 
 It is a set of public API functions and standard for implementation details.
 
+
+Public API
+==========
+
 API is implementation agnostic, all client code should not call policy
 code (see below) directly but use API only.
 
@@ -27,9 +31,6 @@ base classes for both concepts as well as several implementations
 shipped with the library. End user is free to build own implemetations
 if needed.
 
-Public API
-==========
-
 
 Authentication
 ==============
@@ -43,11 +44,6 @@ knowledge is there the user still registered in DB.
 If :class:`aiohttp.web.Request` has an :term:`identity` it means the user has
 some ID that should be checked by :term:`authorization` policy.
 
-
-
-
-
-
-identity is a string shared between browser and server.
+:term:`identity` is a string shared between browser and server.
 Thus it's not supposed to be database primary key, user login/email etc.
 Random string like uuid or hash is better choice.
