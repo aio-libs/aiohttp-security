@@ -56,7 +56,7 @@ Simple example::
 
         # get it started
         srv = await loop.create_server(app.make_handler(),
-                                            '127.0.0.1', 8080)
+                                       '127.0.0.1', 8080)
         print("Server started at http://127.0.0.1:8080")
         return srv
 

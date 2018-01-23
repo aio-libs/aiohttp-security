@@ -6,9 +6,9 @@ from aiohttp_session.cookie_storage import EncryptedCookieStorage
 from aiohttp_security import setup as setup_security
 from aiohttp_security import SessionIdentityPolicy
 
-from .authz import DictionaryAuthorizationPolicy
-from .handlers import configure_handlers
-from .users import user_map
+from demo.dictionary_auth.authz import DictionaryAuthorizationPolicy
+from demo.dictionary_auth.handlers import configure_handlers
+from demo.dictionary_auth.users import user_map
 
 
 def make_app():
