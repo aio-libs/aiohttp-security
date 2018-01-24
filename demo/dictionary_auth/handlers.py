@@ -1,42 +1,30 @@
-import functools
 from textwrap import dedent
 
 from aiohttp import web
 
-from aiohttp_security import remember, forget, authorized_userid, permits
+from aiohttp_security import (
+    remember, forget, authorized_userid,
+    has_permission, login_required,
+)
 
 from .authz import check_credentials
 
 
-def require(permission):
-    def wrapper(f):
-        @functools.wraps(f)
-        async def wrapped(request):
-            has_perm = await permits(request, permission)
-            if not has_perm:
-                message = 'User has no permission {}'.format(permission)
-                raise web.HTTPForbidden(body=message.encode())
-            return await f(request)
-        return wrapped
-    return wrapper
-
-
 index_template = dedent("""
     <!doctype html>
-    <head>
-    </head>
-    <body>
-    <p>{message}</p>
-    <form action="/login" method="post">
-      Login:
-      <input type="text" name="username">
-      Password:
-      <input type="password" name="password">
-      <input type="submit" value="Login">
-    </form>
-    <a href="/logout">Logout</a>
-    </body>
-    """)
+        <head></head>
+        <body>
+            <p>{message}</p>
+            <form action="/login" method="post">
+                Login:
+                <input type="text" name="username">
+                Password:
+                <input type="password" name="password">
+                <input type="submit" value="Login">
+            </form>
+            <a href="/logout">Logout</a>
+        </body>
+""")
 
 
 async def index(request):
@@ -58,7 +46,8 @@ async def login(request):
     username = form.get('username')
     password = form.get('password')
 
-    verified = await check_credentials(request.app.user_map, username, password)
+    verified = await check_credentials(
+        request.app.user_map, username, password)
     if verified:
         await remember(request, response, username)
         return response
@@ -66,7 +55,7 @@ async def login(request):
     return web.HTTPUnauthorized(body='Invalid username / password combination')
 
 
-@require('public')
+@login_required
 async def logout(request):
     response = web.Response(
         text='You have been logged out',
@@ -76,7 +65,7 @@ async def logout(request):
     return response
 
 
-@require('public')
+@has_permission('public')
 async def internal_page(request):
     # pylint: disable=unused-argument
     response = web.Response(
@@ -86,7 +75,7 @@ async def internal_page(request):
     return response
 
 
-@require('protected')
+@has_permission('protected')
 async def protected_page(request):
     # pylint: disable=unused-argument
     response = web.Response(

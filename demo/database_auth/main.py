@@ -9,16 +9,16 @@ from aiopg.sa import create_engine
 from aioredis import create_pool
 
 
-from demo.db_auth import DBAuthorizationPolicy
-from demo.handlers import Web
+from demo.database_auth.db_auth import DBAuthorizationPolicy
+from demo.database_auth.handlers import Web
 
 
 async def init(loop):
     redis_pool = await create_pool(('localhost', 6379))
     db_engine = await create_engine(user='aiohttp_security',
-                                         password='aiohttp_security',
-                                         database='aiohttp_security',
-                                         host='127.0.0.1')
+                                    password='aiohttp_security',
+                                    database='aiohttp_security',
+                                    host='127.0.0.1')
     app = web.Application(loop=loop)
     app.db_engine = db_engine
     setup_session(app, RedisStorage(redis_pool))
