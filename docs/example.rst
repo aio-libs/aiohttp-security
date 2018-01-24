@@ -28,9 +28,9 @@ Simple example::
     async def user_update_handler(request):
         # identity, asked_permission
         user_id = await identity_policy.identify(request)
-        identity = await auth_policy.authorized_user_id(user_id)
-        allowed = await request.auth_policy.permits(identity,
-                                                    asked_permission)
+        identity = await auth_policy.authorized_userid(user_id)
+        allowed = await request.auth_policy.permits(
+            identity, asked_permission)
         if not allowed:
             # how is this pluggable as well?
             # ? return NotAllowedStream()
