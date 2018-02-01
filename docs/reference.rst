@@ -21,7 +21,7 @@ Public API functions
    The action is performed by registered
    :meth:`AbstractIdentityPolicy.remember`.
 
-   Usually the *idenity* is stored in user cookies homehow for using by
+   Usually the *identity* is stored in user cookies somehow for using by
    :func:`authorized_userid` and :func:`permits`.
 
    :param request: :class:`aiohttp.web.Request` object.
