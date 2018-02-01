@@ -13,7 +13,7 @@ async def remember(request, response, identity, **kwargs):
 
     The action is performed by identity_policy.remember()
 
-    Usually the idenity is stored in user cookies homehow but may be
+    Usually the identity is stored in user cookies somehow but may be
     pushed into custom header also.
     """
     assert isinstance(identity, str), identity
