@@ -5,7 +5,7 @@ pytest-cov==2.5.1
 coverage==4.5.1
 sphinx==1.7.1
 pep257==0.7.0
-aiohttp-session==2.1.0
+aiohttp-session==2.3.0
 aiopg[sa]==0.13.2
 aioredis==1.0.0
 hiredis==0.2.0
