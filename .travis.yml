@@ -5,6 +5,11 @@ python:
   - 3.7-dev
   - nightly
 
+matrix:
+  allow_failures:
+  - python: 3.7-dev
+  - python: nightly
+
 install:
 - pip install --upgrade pip
 - pip install -r requirements-dev.txt

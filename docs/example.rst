@@ -28,9 +28,9 @@ Simple example::
     async def user_update_handler(request):
         # identity, asked_permission
         user_id = await identity_policy.identify(request)
-        identity = await auth_policy.authorized_user_id(user_id)
-        allowed = await request.auth_policy.permits(identity,
-                                                    asked_permission)
+        identity = await auth_policy.authorized_userid(user_id)
+        allowed = await request.auth_policy.permits(
+            identity, asked_permission)
         if not allowed:
             # how is this pluggable as well?
             # ? return NotAllowedStream()
@@ -56,7 +56,7 @@ Simple example::
 
         # get it started
         srv = await loop.create_server(app.make_handler(),
-                                            '127.0.0.1', 8080)
+                                       '127.0.0.1', 8080)
         print("Server started at http://127.0.0.1:8080")
         return srv
 

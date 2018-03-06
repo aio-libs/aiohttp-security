@@ -21,12 +21,14 @@ Launch these sql scripts to init database and fill it with sample data:
 
 ``psql template1 < demo/sql/init_db.sql``
 
-and then
+and
 
 ``psql template1 < demo/sql/sample_data.sql``
 
 
-You will have two tables for storing users and their permissions
+Now you have two tables:
+
+- for storing users
 
 +--------------+
 | users        |
@@ -42,7 +44,7 @@ You will have two tables for storing users and their permissions
 | disabled     |
 +--------------+
 
-and second table is permissions table:
+- for storing their permissions
 
 +-----------------+
 | permissions     |
@@ -63,12 +65,12 @@ First one should have these methods: *identify*, *remember* and *forget*.
 For second one: *authorized_userid* and *permits*. We will use built-in
 *SessionIdentityPolicy* and write our own database-based authorization policy.
 
-In our example we will lookup database by user login and if present return
+In our example we will lookup database by user login and if presents then return
 this identity::
 
 
     async def authorized_userid(self, identity):
-        async with  self.dbengine as conn:
+        async with self.dbengine as conn:
             where = sa.and_(db.users.c.login == identity,
                             sa.not_(db.users.c.disabled))
             query = db.users.count().where(where)
@@ -79,7 +81,7 @@ this identity::
                 return None
 
 
-For permission check we will fetch the user first, check if he is superuser
+For permission checking we will fetch the user first, check if he is superuser
 (all permissions are allowed), otherwise check if permission is explicitly set
 for that user::
 
@@ -95,7 +97,7 @@ for that user::
             user = await ret.fetchone()
             if user is not None:
                 user_id = user[0]
-                is_superuser = user[4]
+                is_superuser = user[3]
                 if is_superuser:
                     return True
 
@@ -140,37 +142,33 @@ Once we have all the code in place we can install it for our application::
 
 
 Now we have authorization and can decorate every other view with access rights
-based on permissions. This simple decorator (for class-based handlers) will
-help to do that::
+based on permissions. There are already implemented two decorators::
 
-    def require(permission):
-        def wrapper(f):
-            @functools.wraps(f)
-            async def wrapped(self, request):
-                has_perm = await permits(request, permission)
-                if not has_perm:
-                    message = 'User has no permission {}'.format(permission)
-                    raise web.HTTPForbidden(body=message.encode())
-                return await f(self, request)
-            return wrapped
-        return wrapper
+    from aiohttp_security import has_permission, login_required
 
-
-For each view you need to protect just apply the decorator on it::
+For each view you need to protect - just apply the decorator on it::
 
     class Web:
-        @require('protected')
+        @has_permission('protected')
         async def protected_page(self, request):
             response = web.Response(body=b'You are on protected page')
             return response
 
+or::
 
-If someone will try to access this protected page he will see::
+    class Web:
+        @login_required
+        async def logout(self, request):
+            response = web.Response(body=b'You have been logged out')
+            await forget(request, response)
+            return response
 
-    403, User has no permission "protected"
+If someone try to access that protected page he will see::
+
+    403: Forbidden
 
 
-The best part about it is that you can implement any logic you want until it
+The best part of it - you can implement any logic you want until it
 follows the API conventions.
 
 Launch application
@@ -178,7 +176,7 @@ Launch application
 
 For working with passwords there is a good library passlib_. Once you've
 created some users you want to check their credentials on login. Similar
-function may do what you trying to accomplish::
+function may do what you are trying to accomplish::
 
     from passlib.hash import sha256_crypt
 
@@ -197,8 +195,8 @@ function may do what you trying to accomplish::
 
 Final step is to launch your application::
 
-    python demo/main.py
+    python demo/database_auth/main.py
 
 
-Try to login with admin/moderator/user accounts (with *password* password)
+Try to login with admin/moderator/user accounts (with **password** password)
 and access **/public** or **/protected** endpoints.
