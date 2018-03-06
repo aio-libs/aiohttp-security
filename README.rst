@@ -29,9 +29,12 @@ Examples
 --------
 Take a look at examples:
 
-:ref:`aiohttp-security-example`
+`Basic example`_
 
-:ref:`aiohttp-security-example-db-auth`
+`Example with DB auth`_
+
+.. _`Basic example`: docs/example.rst
+.. _`Example with db auth`: docs/example_db_auth.rst
 
 and demos at **demo** directory.
 
