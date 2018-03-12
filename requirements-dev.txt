@@ -1,6 +1,6 @@
 -e .
 flake8==3.5.0
-pytest==3.4.1
+pytest==3.4.2
 pytest-cov==2.5.1
 coverage==4.5.1
 sphinx==1.7.1
@@ -11,5 +11,5 @@ aioredis==1.1.0
 hiredis==0.2.0
 passlib==1.7.1
 cryptography==2.1.4
-aiohttp==3.0.6
+aiohttp==3.0.7
 pytest-aiohttp==0.3.0
