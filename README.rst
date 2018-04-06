@@ -46,7 +46,7 @@ https://aiohttp-security.readthedocs.io/
 Develop
 -------
 
-``pip install -r requirements-dev``
+``pip install -r requirements-dev.txt``
 
 
 License
