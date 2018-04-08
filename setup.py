@@ -16,7 +16,7 @@ class PyTest(TestCommand):
 
 
 with open(os.path.join(os.path.abspath(os.path.dirname(
-        __file__)), 'aiohttp_security', '__init__.py'), 'rU', encoding='latin1') as fp:
+        __file__)), 'aiohttp_security', '__init__.py'), 'r', encoding='latin1') as fp:
     try:
         version = re.findall(r"^__version__ = '([^']+)'$", fp.read(), re.M)[0]
     except IndexError:
