@@ -30,5 +30,5 @@ class JWTIdentityPolicy(AbstractIdentityPolicy):
     async def remember(self, *args, **kwargs):  # pragma: no cover
         pass
 
-    async def forget(self, request, response):
+    async def forget(self, request, response):  # pragma: no cover
         pass
