@@ -92,13 +92,18 @@ def login_required(fn):
     User is considered authorized if authorized_userid
     returns some value.
     """
+
     @wraps(fn)
     async def wrapped(*args, **kwargs):
         request = args[-1]
-        if not isinstance(request, web.BaseRequest):
+        if isinstance(request, web.View):
+            request = request.request
+        elif not isinstance(request, web.BaseRequest):
             msg = ("Incorrect decorator usage. "
                    "Expecting `def handler(request)` "
-                   "or `def handler(self, request)`.")
+                   "`def handler(self, request)` or "
+                   "`def handler(self)` if handler is "
+                   "a web.View subclasse method.")
             raise RuntimeError(msg)
 
         userid = await authorized_userid(request)
@@ -123,13 +128,18 @@ def has_permission(
     raises HTTPForbidden.
     """
     def wrapper(fn):
+
         @wraps(fn)
         async def wrapped(*args, **kwargs):
             request = args[-1]
-            if not isinstance(request, web.BaseRequest):
+            if isinstance(request, web.View):
+                request = request.request
+            elif not isinstance(request, web.BaseRequest):
                 msg = ("Incorrect decorator usage. "
                        "Expecting `def handler(request)` "
-                       "or `def handler(self, request)`.")
+                       "`def handler(self, request)` or "
+                       "`def handler(self)` if handler is "
+                       "a web.View subclasse method.")
                 raise RuntimeError(msg)
 
             userid = await authorized_userid(request)
