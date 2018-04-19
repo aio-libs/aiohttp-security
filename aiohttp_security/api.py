@@ -145,7 +145,6 @@ def has_permission(
             userid = await authorized_userid(request)
             if userid is None:
                 raise web.HTTPUnauthorized
-
             allowed = await permits(request, permission, context)
             if not allowed:
                 raise web.HTTPForbidden
@@ -155,6 +154,41 @@ def has_permission(
         return wrapped
 
     return wrapper
+
+
+def class_has_permission(permission_prefix, context=None):
+    """Decorator that restrict access only for authorized users
+    with correct permissions for each method of a `aiohttp.web.View`
+    class.
+
+    The needed permission to perform:
+      - POST request is `.create` prefixed by `prefix`
+      - GET request is `.read` prefixed by `prefix`
+      - PATCH or PUT request is `.update` prefixed by `prefix`
+      - DELETE request is `.delete` prefixed by `prefix`
+
+    If user is not authorized - raises HTTPUnauthorized,
+    if user is authorized and does not have permission -
+    raises HTTPForbidden.
+    """
+
+    def decorator(cls):
+        methods = {'post': 'create',
+                   'get': 'read',
+                   'put': 'update',
+                   'patch': 'update',
+                   'delete': 'delete'}
+
+        for method_name, permission in methods.items():
+            method = getattr(cls, method_name, None)
+            if method is not None:
+                decorator = has_permission(
+                    '{}.{}'.format(permission_prefix, permission),
+                    context)
+                setattr(cls, method_name, decorator(method))
+
+        return cls
+    return decorator
 
 
 def setup(app, identity_policy, autz_policy):
