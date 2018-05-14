@@ -65,11 +65,10 @@ async def test_identify_broken_scheme(loop, make_token, test_client):
         policy = request.app[IDENTITY_KEY]
 
         try:
-            identity = await policy.identify(request)
+            await policy.identify(request)
         except ValueError as exc:
             raise web.HTTPBadRequest(reason=exc)
 
-        assert 'Andrew' == identity['login']
         return web.Response()
 
     app = web.Application(loop=loop)

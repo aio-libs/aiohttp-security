@@ -22,7 +22,10 @@ class JWTIdentityPolicy(AbstractIdentityPolicy):
         self.algorithm = algorithm
 
     async def identify(self, request):
-        header_identity = request.headers.get(AUTH_HEADER_NAME, '')
+        header_identity = request.headers.get(AUTH_HEADER_NAME)
+
+        if header_identity is None:
+            return
 
         if not header_identity.startswith(AUTH_SCHEME):
             raise ValueError('Invalid authorization scheme. ' +
