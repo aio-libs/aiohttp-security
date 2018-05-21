@@ -1,10 +1,23 @@
+import jwt
 import pytest
 from aiohttp import web
-from aiohttp_security import AbstractAuthorizationPolicy
+
 from aiohttp_security import setup as _setup
-from aiohttp_security.jwt_identity import JWTIdentityPolicy
+from aiohttp_security import AbstractAuthorizationPolicy
 from aiohttp_security.api import IDENTITY_KEY
-import jwt
+from aiohttp_security.jwt_identity import JWTIdentityPolicy
+
+
+@pytest.fixture
+def make_token():
+    def factory(payload, secret):
+        return jwt.encode(
+            payload,
+            secret,
+            algorithm='HS256',
+        )
+
+    return factory
 
 
 class Autz(AbstractAuthorizationPolicy):
@@ -22,35 +35,48 @@ async def test_no_pyjwt_installed(mocker):
         JWTIdentityPolicy('secret')
 
 
-async def test_identify(loop, test_client):
+async def test_identify(loop, make_token, test_client):
     kwt_secret_key = 'Key'
 
-    async def create(request):
-        response = web.Response()
-        data = await request.post()
-
-        encoded_identity = jwt.encode({'identity': data['login']},
-                                      kwt_secret_key,
-                                      algorithm='HS256')
-
-        response.text = encoded_identity.decode('utf-8')
-        return response
+    token = make_token({'login': 'Andrew'}, kwt_secret_key)
 
     async def check(request):
         policy = request.app[IDENTITY_KEY]
-        user_id = await policy.identify(request)
-        assert 'Andrew' == user_id
+        identity = await policy.identify(request)
+        assert 'Andrew' == identity['login']
         return web.Response()
 
     app = web.Application(loop=loop)
     _setup(app, JWTIdentityPolicy(kwt_secret_key), Autz())
     app.router.add_route('GET', '/', check)
-    app.router.add_route('POST', '/', create)
+
     client = await test_client(app)
-    resp = await client.post('/', data={'login': 'Andrew'})
-    jwt_token = await resp.content.read()
-    assert 200 == resp.status
-    await resp.release()
-    headers = {'Authorization': str(jwt_token.decode('utf-8'))}
+    headers = {'Authorization': 'Bearer {}'.format(token.decode('utf-8'))}
     resp = await client.get('/', headers=headers)
     assert 200 == resp.status
+
+
+async def test_identify_broken_scheme(loop, make_token, test_client):
+    kwt_secret_key = 'Key'
+
+    token = make_token({'login': 'Andrew'}, kwt_secret_key)
+
+    async def check(request):
+        policy = request.app[IDENTITY_KEY]
+
+        try:
+            await policy.identify(request)
+        except ValueError as exc:
+            raise web.HTTPBadRequest(reason=exc)
+
+        return web.Response()
+
+    app = web.Application(loop=loop)
+    _setup(app, JWTIdentityPolicy(kwt_secret_key), Autz())
+    app.router.add_route('GET', '/', check)
+
+    client = await test_client(app)
+    headers = {'Authorization': 'Token {}'.format(token.decode('utf-8'))}
+    resp = await client.get('/', headers=headers)
+    assert 400 == resp.status
+    assert 'Invalid authorization scheme' in resp.reason
