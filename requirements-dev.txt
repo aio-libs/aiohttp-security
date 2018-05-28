@@ -1,6 +1,6 @@
 -e .
 flake8==3.5.0
-pytest==3.5.1
+pytest==3.6.0
 pytest-cov==2.5.1
 pytest-mock==1.10.0
 coverage==4.5.1
@@ -14,4 +14,4 @@ passlib==1.7.1
 cryptography==2.2.2
 aiohttp==3.2.1
 pytest-aiohttp==0.3.0
-pyjwt==1.6.3
+pyjwt==1.6.4
