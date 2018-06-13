@@ -11,7 +11,7 @@ class DBAuthorizationPolicy(AbstractAuthorizationPolicy):
         self.dbengine = dbengine
 
     async def authorized_userid(self, identity):
-        async with self.dbengine as conn:
+        async with self.dbengine.acquire() as conn:
             where = sa.and_(db.users.c.login == identity,
                             sa.not_(db.users.c.disabled))
             query = db.users.count().where(where)
@@ -25,7 +25,7 @@ class DBAuthorizationPolicy(AbstractAuthorizationPolicy):
         if identity is None:
             return False
 
-        async with self.dbengine as conn:
+        async with self.dbengine.acquire() as conn:
             where = sa.and_(db.users.c.login == identity,
                             sa.not_(db.users.c.disabled))
             query = db.users.select().where(where)
@@ -50,7 +50,7 @@ class DBAuthorizationPolicy(AbstractAuthorizationPolicy):
 
 
 async def check_credentials(db_engine, username, password):
-    async with db_engine as conn:
+    async with db_engine.acquire() as conn:
         where = sa.and_(db.users.c.login == username,
                         sa.not_(db.users.c.disabled))
         query = db.users.select().where(where)
