@@ -11,39 +11,76 @@
 
 First of all, what is *aiohttp_security* about?
 
-It is a set of public API functions and standard for implementation details.
+*aiohttp_security* is a set of public API functions as well as a reference standard for implementation details for securing access to assets served by a wsgi server.
+Assets are secured using authentication and authorization as explained below.  *aiohttp_security* is part of the *aio_libs* project which takes advantage of asynchronous
+processing using Python's asyncio library.
 
 
 Public API
 ==========
 
-API is implementation agnostic, all client code should not call policy
-code (see below) directly but use API only.
+The API is agnostic to the low level implementation details such that all client code only needs to implement the endpoints as provided by the API (instead of calling policy
+code directly (see explanation below)).
 
-Via API application can remember/forget user in local session
-(:func:`remember`/:func:`forget`), retrieve :term:`userid`
-(:func:`authorized_userid`) and check :term:`permission` for
-remembered user (:func:`permits`).
+Via the API an application can:
 
-The library internals are built on top of two policies:
-:term:`authentication` and :term:`authorization`. There are abstract
-base classes for both concepts as well as several implementations
-shipped with the library. End user is free to build own implemetations
-if needed.
+(i) remember a user in a local session (:func:`remember`),
+(ii) forget a user in a local session (:func:`forget`),
+(iii) retrieve the :term:`userid` (:func:`authorized_userid`) of a remembered user from an :term:`identity` (discussed below), and
+(iv) check the :term:`permission` of a remembered user (:func:`permits`).
+
+The library internals are built on top of two concepts:
+
+1) :term:`authentication`, and
+2) :term:`authorization`.
+
+There are abstract base classes for both types as well as several pre-built implementations
+that are shipped with the library. However, the end user is free to build their own implementations.
+The library comes with two pre-built identity policies; one that uses cookies, and one that uses sessions [#f1]_. 
+It is envisioned that in most use cases developers will use one of the provided identity policies (Cookie or Session) and
+implement their own authorization policy.
+
+The workflow is as follows:
+
+1) User is authenticated.  This has to be implemented by the developer.
+2) Once user is authenticated an identity string has to be created for that user.  This has to be implemented by the developer.
+3) The identity string is passed to the Identity Policy's remember method and the user is now remembered (Cookie or Session if using built-in).  *Only once a user is remembered can the other API methods:* :func:`permits`, :func:`forget`, *and* :func:`authorized_userid` *be invoked* .
+4) If the user tries to access a restricted asset the :func:`permits` method is called.  Usually assets are protected using the **@aiohttp_security.has_permission(**\ *permission*\ **)** decorator.  This should return True if permission is granted.  
+
+   The :func:`permits` method is implemented by the developer as part of the :class:`AbstractAuthorizationPolicy` and passed to the application at runtime via setup. 
+ In addition a  :func:`@aiohttp_security.login_required decorator` also exists that requires no permissions (i.e. doesn't call :func:`permits` method) but only requires that the user is remembered (i.e. authenticated/logged in).
+
+
 
 
 Authentication
 ==============
+Authentication is the process where a user's identity is verified. It confirms who the user is. This is traditionally done using a user name and password (note: this is not the only way).
+A authenticated user has no access rights, rather an authenticated user merely confirms that the user exists and that the user is who they say they are.
 
-Actions related to retrieving, storing and removing user's
-:term:`identity`.
+In *aiohttp_security* the developer is responsible for their own authentication mechanism.  *aiohttp_security* only requires that the authentication result in a identity string which
+corresponds to a user's id in the underlying system.  
 
-Authenticated user has no access rights, the system even has no
-knowledge is there the user still registered in DB.
+ *Note:* :term:`identity` is a string that is shared between the browser and the server.  Therefore it is recommended that a random string such as a uuid or hash is used rather than things like a database primary key, user login/email, etc.
 
-If :class:`aiohttp.web.Request` has an :term:`identity` it means the user has
-some ID that should be checked by :term:`authorization` policy.
+Identity Policy
+==============
 
-:term:`identity` is a string shared between browser and server.
-Thus it's not supposed to be database primary key, user login/email etc.
-Random string like uuid or hash is better choice.
+Once a user is authenticated the *aiohttp_security* API is invoked for storing, retrieving,  and removing a user's :term:`identity`.  This is accommplished via AbstractIdentityPolicy's :func:`remember`, :func:`identify`, and :func:`forget` methods.  The Identity Policy is therefore the mechanism by which a authenticated user is persisted in the system.
+
+*aiohttp_security* has two built in identity policy's for this purpose.  :term:`CookiesIdentityPolicy` that uses cookies and :term:`SessionIdentityPolicy` that uses sessions via :term:`aiohttp.session` library.
+
+Authorization
+==============
+
+Once a user is authenticated (see above) it means that the user has an :term:`identity`.  This :term:`identity` can now be used for checking access rights or :term:`permission` using a :term:`authorization` policy.
+The authorization policy's :func:`permits()` method is used for this purpose.
+
+
+When :class:`aiohttp.web.Request` has an :term:`identity` it means the user has been authenticated and therefore has an :term:`identity` that can be checked by the :term:`authorization` policy.
+
+ As noted above, :term:`identity` is a string that is shared between the browser and the server.  Therefore it is recommended that a random string such as a uuid or hash is used rather than things like a database primary key, user login/email, etc.
+
+
+.. rubric:: Footnotes
+.. [#f1] jwt - json web tokens in the works
