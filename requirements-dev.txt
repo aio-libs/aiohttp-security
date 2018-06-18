@@ -12,6 +12,6 @@ aioredis==1.1.0
 hiredis==0.2.0
 passlib==1.7.1
 cryptography==2.2.2
-aiohttp==3.3.1
+aiohttp==3.3.2
 pytest-aiohttp==0.3.0
 pyjwt==1.6.4
