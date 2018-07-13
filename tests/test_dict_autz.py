@@ -194,6 +194,41 @@ async def test_login_required(loop, test_client):
     assert web.HTTPUnauthorized.status_code == resp.status
 
 
+async def test_login_required_with_class_view(loop, test_client):
+
+    class IndexView(web.View):
+        @login_required
+        async def get(self):
+            return web.HTTPOk()
+
+    async def login(request):
+        response = web.HTTPFound(location='/')
+        await remember(request, response, 'UserID')
+        return response
+
+    async def logout(request):
+        response = web.HTTPFound(location='/')
+        await forget(request, response)
+        return response
+
+    app = web.Application(loop=loop)
+    _setup(app, CookiesIdentityPolicy(), Autz())
+    app.router.add_route('*', '/', IndexView)
+    app.router.add_route('POST', '/login', login)
+    app.router.add_route('POST', '/logout', logout)
+    client = await test_client(app)
+    resp = await client.get('/')
+    assert web.HTTPUnauthorized.status_code == resp.status
+
+    await client.post('/login')
+    resp = await client.get('/')
+    assert web.HTTPOk.status_code == resp.status
+
+    await client.post('/logout')
+    resp = await client.get('/')
+    assert web.HTTPUnauthorized.status_code == resp.status
+
+
 async def test_has_permission(loop, test_client):
 
     @has_permission('read')
@@ -248,4 +283,64 @@ async def test_has_permission(loop, test_client):
     resp = await client.get('/permission/write')
     assert web.HTTPUnauthorized.status_code == resp.status
     resp = await client.get('/permission/forbid')
+    assert web.HTTPUnauthorized.status_code == resp.status
+
+
+async def test_has_permission_with_class_view(loop, test_client):
+
+    class IndexView(web.View):
+        @has_permission('read')
+        async def get(self):
+            return web.HTTPOk()
+
+        @has_permission('write')
+        async def post(self):
+            return web.HTTPOk()
+
+        @has_permission('forbid')
+        async def delete(self):
+            return web.HTTPOk()
+
+    class SessionView(web.View):
+        async def post(self):
+            response = web.HTTPFound(location='/')
+            await remember(self.request, response, 'UserID')
+            return response
+
+        async def delete(self):
+            response = web.HTTPFound(location='/')
+            await forget(self.request, response)
+            return response
+
+    app = web.Application(loop=loop)
+    _setup(app, CookiesIdentityPolicy(), Autz())
+
+    app.router.add_route(
+        '*', '/permission', IndexView)
+    app.router.add_route(
+        '*', '/session', SessionView)
+
+    client = await test_client(app)
+
+    resp = await client.get('/permission')
+    assert web.HTTPUnauthorized.status_code == resp.status
+    resp = await client.post('/permission')
+    assert web.HTTPUnauthorized.status_code == resp.status
+    resp = await client.delete('/permission')
+    assert web.HTTPUnauthorized.status_code == resp.status
+
+    await client.post('/session')
+    resp = await client.get('/permission')
+    assert web.HTTPOk.status_code == resp.status
+    resp = await client.post('/permission')
+    assert web.HTTPOk.status_code == resp.status
+    resp = await client.delete('/permission')
+    assert web.HTTPForbidden.status_code == resp.status
+
+    await client.delete('/session')
+    resp = await client.get('/permission')
+    assert web.HTTPUnauthorized.status_code == resp.status
+    resp = await client.post('/permission')
+    assert web.HTTPUnauthorized.status_code == resp.status
+    resp = await client.delete('/permission')
     assert web.HTTPUnauthorized.status_code == resp.status
