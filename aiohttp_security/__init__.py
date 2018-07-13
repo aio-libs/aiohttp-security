@@ -1,5 +1,6 @@
 from .abc import AbstractAuthorizationPolicy, AbstractIdentityPolicy
-from .api import (authorized_userid, forget, has_permission, is_anonymous,
+from .api import (authorized_userid, forget, has_permission,
+                  class_has_permission, is_anonymous,
                   login_required, permits, remember, setup)
 from .cookies_identity import CookiesIdentityPolicy
 from .session_identity import SessionIdentityPolicy
@@ -13,4 +14,4 @@ __all__ = ('AbstractIdentityPolicy', 'AbstractAuthorizationPolicy',
            'JWTIdentityPolicy',
            'remember', 'forget', 'authorized_userid',
            'permits', 'setup', 'is_anonymous',
-           'login_required', 'has_permission')
+           'login_required', 'has_permission', 'class_has_permission')
