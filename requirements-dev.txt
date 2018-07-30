@@ -11,7 +11,7 @@ aiopg[sa]==0.14.0
 aioredis==1.1.0
 hiredis==0.2.0
 passlib==1.7.1
-cryptography==2.2.2
+cryptography==2.3
 aiohttp==3.3.2
 pytest-aiohttp==0.3.0
 pyjwt==1.6.4
