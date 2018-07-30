@@ -1,6 +1,6 @@
 -e .
 flake8==3.5.0
-pytest==3.6.1
+pytest==3.6.4
 pytest-cov==2.5.1
 pytest-mock==1.10.0
 coverage==4.5.1
