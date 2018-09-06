@@ -15,23 +15,23 @@ class Autz(AbstractAuthorizationPolicy):
         pass
 
 
-async def test_remember(loop, test_client):
+async def test_remember(loop, aiohttp_client):
 
     async def handler(request):
         response = web.Response()
         await remember(request, response, 'Andrew')
         return response
 
-    app = web.Application(loop=loop)
+    app = web.Application()
     _setup(app, CookiesIdentityPolicy(), Autz())
     app.router.add_route('GET', '/', handler)
-    client = await test_client(app)
+    client = await aiohttp_client(app)
     resp = await client.get('/')
     assert 200 == resp.status
     assert 'Andrew' == resp.cookies['AIOHTTP_SECURITY'].value
 
 
-async def test_identify(loop, test_client):
+async def test_identify(loop, aiohttp_client):
 
     async def create(request):
         response = web.Response()
@@ -44,11 +44,11 @@ async def test_identify(loop, test_client):
         assert 'Andrew' == user_id
         return web.Response()
 
-    app = web.Application(loop=loop)
+    app = web.Application()
     _setup(app, CookiesIdentityPolicy(), Autz())
     app.router.add_route('GET', '/', check)
     app.router.add_route('POST', '/', create)
-    client = await test_client(app)
+    client = await aiohttp_client(app)
     resp = await client.post('/')
     assert 200 == resp.status
     await resp.release()
@@ -56,7 +56,7 @@ async def test_identify(loop, test_client):
     assert 200 == resp.status
 
 
-async def test_forget(loop, test_client):
+async def test_forget(loop, aiohttp_client):
 
     async def index(request):
         return web.Response()
@@ -64,19 +64,19 @@ async def test_forget(loop, test_client):
     async def login(request):
         response = web.HTTPFound(location='/')
         await remember(request, response, 'Andrew')
-        return response
+        raise response
 
     async def logout(request):
         response = web.HTTPFound(location='/')
         await forget(request, response)
-        return response
+        raise response
 
-    app = web.Application(loop=loop)
+    app = web.Application()
     _setup(app, CookiesIdentityPolicy(), Autz())
     app.router.add_route('GET', '/', index)
     app.router.add_route('POST', '/login', login)
     app.router.add_route('POST', '/logout', logout)
-    client = await test_client(app)
+    client = await aiohttp_client(app)
     resp = await client.post('/login')
     assert 200 == resp.status
     assert str(resp.url).endswith('/')

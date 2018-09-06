@@ -1,5 +1,6 @@
 -e .
 flake8==3.5.0
+async-timeout==3.0
 pytest==3.7.4
 pytest-cov==2.5.1
 pytest-mock==1.10.0

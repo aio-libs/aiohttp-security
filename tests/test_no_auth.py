@@ -2,21 +2,21 @@ from aiohttp import web
 from aiohttp_security import authorized_userid, permits
 
 
-async def test_authorized_userid(loop, test_client):
+async def test_authorized_userid(loop, aiohttp_client):
 
     async def check(request):
         userid = await authorized_userid(request)
         assert userid is None
         return web.Response()
 
-    app = web.Application(loop=loop)
+    app = web.Application()
     app.router.add_route('GET', '/', check)
-    client = await test_client(app)
+    client = await aiohttp_client(app)
     resp = await client.get('/')
     assert 200 == resp.status
 
 
-async def test_permits(loop, test_client):
+async def test_permits(loop, aiohttp_client):
 
     async def check(request):
         ret = await permits(request, 'read')
@@ -27,8 +27,8 @@ async def test_permits(loop, test_client):
         assert ret
         return web.Response()
 
-    app = web.Application(loop=loop)
+    app = web.Application()
     app.router.add_route('GET', '/', check)
-    client = await test_client(app)
+    client = await aiohttp_client(app)
     resp = await client.get('/')
     assert 200 == resp.status

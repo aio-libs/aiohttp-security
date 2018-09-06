@@ -13,6 +13,19 @@
 Public API functions
 ====================
 
+.. function:: setup(app, identity_policy, autz_policy)
+
+   Setup :mod:`aiohttp` application with security policies.
+
+   :param app: aiohttp :class:`aiohttp.web.Application` instance.
+
+   :param identity_policy: indentification policy, an
+                           :class:`AbstractIdentityPolicy` instance.
+
+   :param autz_policy: authorization policy, an
+                           :class:`AbstractAuthorizationPolicy` instance.
+
+
 .. coroutinefunction:: remember(request, response, identity, **kwargs)
 
    Remember *identity* in *response*, e.g. by storing a cookie or
@@ -50,6 +63,41 @@ Public API functions
                     descendants like :class:`aiohttp.web.Response`.
 
 
+.. coroutinefunction:: check_authorized(request)
+
+   Checker that doesn't pass if user is not authorized by *request*.
+
+   :param request:  :class:`aiohttp.web.Request` object.
+
+   :return str: authorized user ID if success
+
+   :raise: :class:`aiohttp.web.HTTPUnauthorized` for anonymous users.
+
+   Usage::
+
+      async def handler(request):
+          await check_authorized(request)
+          # this line is never executed for anonymous users
+
+
+.. coroutinefunction:: check_permission(request, permission)
+
+   Checker that doesn't pass if user has no requested permission.
+
+   :param request:  :class:`aiohttp.web.Request` object.
+
+   :raise: :class:`aiohttp.web.HTTPUnauthorized` for anonymous users.
+
+   :raise: :class:`aiohttp.web.HTTPForbidden` if user is
+           authorized but has no access rights.
+
+   Usage::
+
+      async def handler(request):
+          await check_permission(request, 'read')
+          # this line is never executed if a user has no read permission
+
+
 .. coroutinefunction:: authorized_userid(request)
 
    Retrieve :term:`userid`.
@@ -78,7 +126,8 @@ Public API functions
 
    :param request: :class:`aiohttp.web.Request` object.
 
-   :param permission: Requested :term:`permission`. :class:`str` or :class:`enum.Enum` object.
+   :param permission: Requested :term:`permission`. :class:`str` or
+                      :class:`enum.Enum` object.
 
    :param context: additional object may be passed into
                    :meth:`AbstractAuthorizationPolicy.permission`
@@ -92,7 +141,8 @@ Public API functions
 
    Checks if user is anonymous user.
 
-   Return ``True`` if user is not remembered in request, otherwise returns ``False``.
+   Return ``True`` if user is not remembered in request, otherwise
+   returns ``False``.
 
    :param request: :class:`aiohttp.web.Request` object.
 
@@ -103,29 +153,27 @@ Public API functions
 
    Raises :class:`aiohttp.web.HTTPUnauthorized` if user is not authorized.
 
+   .. deprecated:: 0.3
+
+      Use :func:`check_authorized` async function.
+
 
 .. decorator:: has_permission(permission)
 
    Decorator for handlers that checks if user is authorized
    and has correct permission.
 
-   Raises :class:`aiohttp.web.HTTPUnauthorized` if user is not authorized.
-   Raises :class:`aiohttp.web.HTTPForbidden` if user is authorized but has no access rights.
+   Raises :class:`aiohttp.web.HTTPUnauthorized` if user is not
+   authorized.
+
+   Raises :class:`aiohttp.web.HTTPForbidden` if user is
+   authorized but has no access rights.
 
    :param str permission: requested :term:`permission`.
 
+   .. deprecated:: 0.3
 
-.. function:: setup(app, identity_policy, autz_policy)
-
-   Setup :mod:`aiohttp` application with security policies.
-
-   :param app: aiohttp :class:`aiohttp.web.Application` instance.
-
-   :param identity_policy: indentification policy, an
-                           :class:`AbstractIdentityPolicy` instance.
-
-   :param autz_policy: authorization policy, an
-                           :class:`AbstractAuthorizationPolicy` instance.
+      Use :func:`check_authorized` async function.
 
 
 Abstract policies

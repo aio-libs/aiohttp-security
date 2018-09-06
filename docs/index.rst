@@ -3,6 +3,7 @@ aiohttp_security
 
 The library provides security for :ref:`aiohttp.web<aiohttp-web>`.
 
+The current version is |version|
 
 Contents
 --------

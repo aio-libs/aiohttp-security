@@ -9,7 +9,7 @@ Simple example::
 
     from aiohttp import web
     from aiohttp_session import SimpleCookieStorage, session_middleware
-    from aiohttp_security import has_permission, \
+    from aiohttp_security import check_permission, \
         is_anonymous, remember, forget, \
         setup as setup_security, SessionIdentityPolicy
     from aiohttp_security.abc import AbstractAuthorizationPolicy
@@ -63,13 +63,13 @@ Simple example::
         raise redirect_response
 
 
-    @has_permission('listen')
     async def handler_listen(request):
+        await check_permission(request, 'listen')
         return web.Response(body="I can listen!")
 
 
-    @has_permission('speak')
     async def handler_speak(request):
+        await check_permission(request, 'speak')
         return web.Response(body="I can speak!")
 
 
@@ -85,11 +85,12 @@ Simple example::
         app = web.Application(middlewares=[middleware])
 
         # add the routes
-        app.router.add_route('GET', '/', handler_root)
-        app.router.add_route('GET', '/login', handler_login_jack)
-        app.router.add_route('GET', '/logout', handler_logout)
-        app.router.add_route('GET', '/listen', handler_listen)
-        app.router.add_route('GET', '/speak', handler_speak)
+        app.add_routes([
+            web.get('/', handler_root),
+            web.get('/login', handler_login_jack),
+            web.get('/logout', handler_logout),
+            web.get('/listen', handler_listen),
+            web.get('/speak', handler_speak)])
 
         # set up policies
         policy = SessionIdentityPolicy()

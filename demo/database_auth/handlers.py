@@ -4,7 +4,7 @@ from aiohttp import web
 
 from aiohttp_security import (
     remember, forget, authorized_userid,
-    has_permission, login_required,
+    check_permission, check_authorized,
 )
 
 from .db_auth import check_credentials
@@ -45,25 +45,25 @@ class Web(object):
         db_engine = request.app.db_engine
         if await check_credentials(db_engine, login, password):
             await remember(request, response, login)
-            return response
+            raise response
 
-        return web.HTTPUnauthorized(
+        raise web.HTTPUnauthorized(
             body=b'Invalid username/password combination')
 
-    @login_required
     async def logout(self, request):
+        await check_authorized(request)
         response = web.Response(body=b'You have been logged out')
         await forget(request, response)
         return response
 
-    @has_permission('public')
     async def internal_page(self, request):
+        await check_permission(request, 'public')
         response = web.Response(
             body=b'This page is visible for all registered users')
         return response
 
-    @has_permission('protected')
     async def protected_page(self, request):
+        await check_permission(request, 'protected')
         response = web.Response(body=b'You are on protected page')
         return response
 

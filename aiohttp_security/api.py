@@ -1,4 +1,5 @@
 import enum
+import warnings
 from aiohttp import web
 from aiohttp_security.abc import (AbstractIdentityPolicy,
                                   AbstractAuthorizationPolicy)
@@ -86,6 +87,15 @@ async def is_anonymous(request):
     return False
 
 
+async def check_authorized(request):
+    """Checker that raises HTTPUnauthorized for anonymous users.
+    """
+    userid = await authorized_userid(request)
+    if userid is None:
+        raise web.HTTPUnauthorized()
+    return userid
+
+
 def login_required(fn):
     """Decorator that restrict access only for authorized users.
 
@@ -101,21 +111,34 @@ def login_required(fn):
                    "or `def handler(self, request)`.")
             raise RuntimeError(msg)
 
-        userid = await authorized_userid(request)
-        if userid is None:
-            raise web.HTTPUnauthorized
+        await check_authorized(request)
+        return await fn(*args, **kwargs)
 
-        ret = await fn(*args, **kwargs)
-        return ret
-
+    warnings.warn("login_required decorator is deprecated, "
+                  "use check_authorized instead",
+                  DeprecationWarning)
     return wrapped
+
+
+async def check_permission(request, permission, context=None):
+    """Checker that passes only to authoraised users with given permission.
+
+    If user is not authorized - raises HTTPUnauthorized,
+    if user is authorized and does not have permission -
+    raises HTTPForbidden.
+    """
+
+    await check_authorized(request)
+    allowed = await permits(request, permission, context)
+    if not allowed:
+        raise web.HTTPForbidden()
 
 
 def has_permission(
     permission,
     context=None,
 ):
-    """Decorator that restrict access only for authorized users
+    """Decorator that restricts access only for authorized users
     with correct permissions.
 
     If user is not authorized - raises HTTPUnauthorized,
@@ -132,18 +155,14 @@ def has_permission(
                        "or `def handler(self, request)`.")
                 raise RuntimeError(msg)
 
-            userid = await authorized_userid(request)
-            if userid is None:
-                raise web.HTTPUnauthorized
-
-            allowed = await permits(request, permission, context)
-            if not allowed:
-                raise web.HTTPForbidden
-            ret = await fn(*args, **kwargs)
-            return ret
+            await check_permission(request, permission, context)
+            return await fn(*args, **kwargs)
 
         return wrapped
 
+    warnings.warn("has_permission decorator is deprecated, "
+                  "use check_permission instead",
+                  DeprecationWarning)
     return wrapper
 
 

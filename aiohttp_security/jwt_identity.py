@@ -35,7 +35,7 @@ class JWTIdentityPolicy(AbstractIdentityPolicy):
 
         identity = jwt.decode(token,
                               self.secret,
-                              algorithm=self.algorithm)
+                              algorithms=[self.algorithm])
         return identity
 
     async def remember(self, *args, **kwargs):  # pragma: no cover

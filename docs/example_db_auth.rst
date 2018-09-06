@@ -133,7 +133,7 @@ Once we have all the code in place we can install it for our application::
                                        password='aiohttp_security',
                                        database='aiohttp_security',
                                        host='127.0.0.1')
-        app = web.Application(loop=loop)
+        app = web.Application()
         setup_session(app, RedisStorage(redis_pool))
         setup_security(app,
                        SessionIdentityPolicy(),
@@ -142,23 +142,23 @@ Once we have all the code in place we can install it for our application::
 
 
 Now we have authorization and can decorate every other view with access rights
-based on permissions. There are already implemented two decorators::
+based on permissions. There are already implemented two helpers::
 
-    from aiohttp_security import has_permission, login_required
+    from aiohttp_security import check_authorized, check_permission
 
 For each view you need to protect - just apply the decorator on it::
 
     class Web:
-        @has_permission('protected')
         async def protected_page(self, request):
+            await check_permission(request, 'protected')
             response = web.Response(body=b'You are on protected page')
             return response
 
 or::
 
     class Web:
-        @login_required
         async def logout(self, request):
+            await check_authorized(request)
             response = web.Response(body=b'You have been logged out')
             await forget(request, response)
             return response

@@ -19,7 +19,7 @@ async def init(loop):
                                     password='aiohttp_security',
                                     database='aiohttp_security',
                                     host='127.0.0.1')
-    app = web.Application(loop=loop)
+    app = web.Application()
     app.db_engine = db_engine
     setup_session(app, RedisStorage(redis_pool))
     setup_security(app,

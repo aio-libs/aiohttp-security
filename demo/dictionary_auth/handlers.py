@@ -4,7 +4,7 @@ from aiohttp import web
 
 from aiohttp_security import (
     remember, forget, authorized_userid,
-    has_permission, login_required,
+    check_permission, check_authorized,
 )
 
 from .authz import check_credentials
@@ -55,8 +55,8 @@ async def login(request):
     return web.HTTPUnauthorized(body='Invalid username / password combination')
 
 
-@login_required
 async def logout(request):
+    await check_authorized(request)
     response = web.Response(
         text='You have been logged out',
         content_type='text/html',
@@ -65,9 +65,8 @@ async def logout(request):
     return response
 
 
-@has_permission('public')
 async def internal_page(request):
-    # pylint: disable=unused-argument
+    await check_permission(request, 'public')
     response = web.Response(
         text='This page is visible for all registered users',
         content_type='text/html',
@@ -75,9 +74,8 @@ async def internal_page(request):
     return response
 
 
-@has_permission('protected')
 async def protected_page(request):
-    # pylint: disable=unused-argument
+    await check_permission(request, 'protected')
     response = web.Response(
         text='You are on protected page',
         content_type='text/html',

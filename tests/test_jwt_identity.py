@@ -35,7 +35,7 @@ async def test_no_pyjwt_installed(mocker):
         JWTIdentityPolicy('secret')
 
 
-async def test_identify(loop, make_token, test_client):
+async def test_identify(loop, make_token, aiohttp_client):
     kwt_secret_key = 'Key'
 
     token = make_token({'login': 'Andrew'}, kwt_secret_key)
@@ -46,17 +46,17 @@ async def test_identify(loop, make_token, test_client):
         assert 'Andrew' == identity['login']
         return web.Response()
 
-    app = web.Application(loop=loop)
+    app = web.Application()
     _setup(app, JWTIdentityPolicy(kwt_secret_key), Autz())
     app.router.add_route('GET', '/', check)
 
-    client = await test_client(app)
+    client = await aiohttp_client(app)
     headers = {'Authorization': 'Bearer {}'.format(token.decode('utf-8'))}
     resp = await client.get('/', headers=headers)
     assert 200 == resp.status
 
 
-async def test_identify_broken_scheme(loop, make_token, test_client):
+async def test_identify_broken_scheme(loop, make_token, aiohttp_client):
     kwt_secret_key = 'Key'
 
     token = make_token({'login': 'Andrew'}, kwt_secret_key)
@@ -71,11 +71,11 @@ async def test_identify_broken_scheme(loop, make_token, test_client):
 
         return web.Response()
 
-    app = web.Application(loop=loop)
+    app = web.Application()
     _setup(app, JWTIdentityPolicy(kwt_secret_key), Autz())
     app.router.add_route('GET', '/', check)
 
-    client = await test_client(app)
+    client = await aiohttp_client(app)
     headers = {'Authorization': 'Token {}'.format(token.decode('utf-8'))}
     resp = await client.get('/', headers=headers)
     assert 400 == resp.status
