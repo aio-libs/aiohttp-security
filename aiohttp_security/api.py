@@ -94,7 +94,7 @@ def login_required(fn):
     """
     @wraps(fn)
     async def wrapped(*args, **kwargs):
-        request = args[-1]
+        request = kwargs.get('request', args[-1] if args else None)
         if not isinstance(request, web.BaseRequest):
             msg = ("Incorrect decorator usage. "
                    "Expecting `def handler(request)` "
@@ -125,7 +125,7 @@ def has_permission(
     def wrapper(fn):
         @wraps(fn)
         async def wrapped(*args, **kwargs):
-            request = args[-1]
+            request = kwargs.get('request', args[-1] if args else None)
             if not isinstance(request, web.BaseRequest):
                 msg = ("Incorrect decorator usage. "
                        "Expecting `def handler(request)` "
