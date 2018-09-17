@@ -1,4 +1,3 @@
-import enum
 import warnings
 from aiohttp import web
 from aiohttp_security.abc import (AbstractIdentityPolicy,
@@ -60,8 +59,6 @@ async def authorized_userid(request):
 
 
 async def permits(request, permission, context=None):
-    assert isinstance(permission, (str, enum.Enum)), permission
-    assert permission
     identity_policy = request.app.get(IDENTITY_KEY)
     autz_policy = request.app.get(AUTZ_KEY)
     if identity_policy is None or autz_policy is None:
