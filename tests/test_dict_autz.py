@@ -1,5 +1,6 @@
 import enum
 import pytest
+from collections import namedtuple
 
 from aiohttp import web
 from aiohttp_security import setup as _setup
@@ -96,6 +97,49 @@ async def test_permits_enum_permission(loop, aiohttp_client):
         ret = await permits(request, Permission.WRITE)
         assert ret
         ret = await permits(request, Permission.UNKNOWN)
+        assert not ret
+        return web.Response()
+
+    app = web.Application()
+    _setup(app, CookiesIdentityPolicy(), Autz())
+    app.router.add_route('GET', '/', check)
+    app.router.add_route('POST', '/login', login)
+    client = await aiohttp_client(app)
+    resp = await client.post('/login')
+    assert 200 == resp.status
+
+
+async def test_permits_class_permission(loop, aiohttp_client):
+    Permission = namedtuple('Permission', ('action',))
+    read_permission = Permission('read')
+    write_permission = Permission('write')
+    unknown_permission = Permission('unknown')
+
+    class Autz(AbstractAuthorizationPolicy):
+
+        async def permits(self, identity, permission, context=None):
+            if identity == 'UserID':
+                return permission in {read_permission, write_permission}
+            else:
+                return False
+
+        async def authorized_userid(self, identity):
+            if identity == 'UserID':
+                return 'Andrew'
+            else:
+                return None
+
+    async def login(request):
+        response = web.HTTPFound(location='/')
+        await remember(request, response, 'UserID')
+        raise response
+
+    async def check(request):
+        ret = await permits(request, read_permission)
+        assert ret
+        ret = await permits(request, write_permission)
+        assert ret
+        ret = await permits(request, unknown_permission)
         assert not ret
         return web.Response()
 
