@@ -1,7 +1,7 @@
 aiohttp_security
 ================
-.. image:: https://travis-ci.org/aio-libs/aiohttp-security.svg?branch=master
-    :target: https://travis-ci.org/aio-libs/aiohttp-security
+.. image:: https://travis-ci.com/aio-libs/aiohttp-security.svg?branch=master
+    :target: https://travis-ci.com/aio-libs/aiohttp-security
 .. image:: https://codecov.io/github/aio-libs/aiohttp-security/coverage.svg?branch=master
     :target: https://codecov.io/github/aio-libs/aiohttp-security
 .. image:: https://readthedocs.org/projects/aiohttp-security/badge/?version=latest
