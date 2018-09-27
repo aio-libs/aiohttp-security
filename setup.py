@@ -27,7 +27,7 @@ def read(f):
     return open(os.path.join(os.path.dirname(__file__), f)).read().strip()
 
 
-install_requires = ['aiohttp>=3.0.0']
+install_requires = ['aiohttp>=3.2.0']
 tests_require = install_requires + ['pytest']
 extras_require = {'session': 'aiohttp-session'}
 
@@ -43,6 +43,7 @@ setup(name='aiohttp-security',
           'Programming Language :: Python :: 3',
           'Programming Language :: Python :: 3.5',
           'Programming Language :: Python :: 3.6',
+          'Programming Language :: Python :: 3.7',
           'Topic :: Internet :: WWW/HTTP',
           'Framework :: AsyncIO',
       ],

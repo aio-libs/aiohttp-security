@@ -19,7 +19,7 @@ async def remember(request, response, identity, **kwargs):
     """
     assert isinstance(identity, str), identity
     assert identity
-    identity_policy = request.app.get(IDENTITY_KEY)
+    identity_policy = request.config_dict.get(IDENTITY_KEY)
     if identity_policy is None:
         text = ("Security subsystem is not initialized, "
                 "call aiohttp_security.setup(...) first")
@@ -36,7 +36,7 @@ async def forget(request, response):
     Usually it clears cookie or server-side storage to forget user
     session.
     """
-    identity_policy = request.app.get(IDENTITY_KEY)
+    identity_policy = request.config_dict.get(IDENTITY_KEY)
     if identity_policy is None:
         text = ("Security subsystem is not initialized, "
                 "call aiohttp_security.setup(...) first")
@@ -48,8 +48,8 @@ async def forget(request, response):
 
 
 async def authorized_userid(request):
-    identity_policy = request.app.get(IDENTITY_KEY)
-    autz_policy = request.app.get(AUTZ_KEY)
+    identity_policy = request.config_dict.get(IDENTITY_KEY)
+    autz_policy = request.config_dict.get(AUTZ_KEY)
     if identity_policy is None or autz_policy is None:
         return None
     identity = await identity_policy.identify(request)
@@ -62,8 +62,8 @@ async def authorized_userid(request):
 async def permits(request, permission, context=None):
     assert isinstance(permission, (str, enum.Enum)), permission
     assert permission
-    identity_policy = request.app.get(IDENTITY_KEY)
-    autz_policy = request.app.get(AUTZ_KEY)
+    identity_policy = request.config_dict.get(IDENTITY_KEY)
+    autz_policy = request.config_dict.get(AUTZ_KEY)
     if identity_policy is None or autz_policy is None:
         return True
     identity = await identity_policy.identify(request)
@@ -78,7 +78,7 @@ async def is_anonymous(request):
     User is considered anonymous if there is not identity
     in request.
     """
-    identity_policy = request.app.get(IDENTITY_KEY)
+    identity_policy = request.config_dict.get(IDENTITY_KEY)
     if identity_policy is None:
         return True
     identity = await identity_policy.identify(request)
