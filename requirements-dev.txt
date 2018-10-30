@@ -1,7 +1,7 @@
 -e .
-flake8==3.5.0
+flake8==3.6.0
 async-timeout==3.0.1
-pytest==3.9.1
+pytest==3.9.3
 pytest-cov==2.6.0
 pytest-mock==1.10.0
 coverage==4.5.1
@@ -9,7 +9,7 @@ sphinx==1.8.1
 pep257==0.7.0
 aiohttp-session==2.7.0
 aiopg[sa]==0.15.0
-aioredis==1.1.0
+aioredis==1.2.0
 hiredis==0.2.0
 passlib==1.7.1
 cryptography==2.3.1
