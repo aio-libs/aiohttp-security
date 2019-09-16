@@ -2,7 +2,7 @@ language: python
 python:
   - 3.5
   - 3.6
-  - 3.7-dev
+  - 3.7
   - nightly
 
 matrix:
@@ -21,11 +21,6 @@ script:
 after_success:
 - codecov
 
-env:
-  matrix:
-  - PYTHONASYNCIODEBUG=x
-  - PYTHONASYNCIODEBUG=
-
 deploy:
   provider: pypi
   user: aio-libs-bot
@@ -35,5 +30,4 @@ deploy:
   on:
     tags: true
     all_branches: true
-    python: 3.6
-    condition: $PYTHONASYNCIODEBUG = ""
+    python: 3.7
