@@ -7,7 +7,7 @@ pytest-mock==1.10.4
 coverage==4.5.4
 sphinx==2.2.0
 pep257==0.7.0
-aiohttp-session==2.7.0
+aiohttp-session==2.8.0
 aiopg[sa]==0.16.0
 aioredis==1.2.0
 hiredis==1.0.0
