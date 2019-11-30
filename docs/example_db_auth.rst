@@ -53,7 +53,7 @@ Now you have two tables:
 +-----------------+
 | user_id         |
 +-----------------+
-| permission_name |
+| perm_name       |
 +-----------------+
 
 
