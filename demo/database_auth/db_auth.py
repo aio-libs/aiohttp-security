@@ -57,6 +57,6 @@ async def check_credentials(db_engine, username, password):
         ret = await conn.execute(query)
         user = await ret.fetchone()
         if user is not None:
-            hash = user[2]
-            return sha256_crypt.verify(password, hash)
+            hashed = user[2]
+            return sha256_crypt.verify(password, hashed)
     return False
