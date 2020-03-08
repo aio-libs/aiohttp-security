@@ -21,9 +21,17 @@ Simplest case (authorization via cookies) ::
 
     $ pip install aiohttp_security
 
+Or via Pipenv ::
+
+    $ pipenv install aiohttp_security
+
 With `aiohttp-session` support ::
 
     $ pip install aiohttp_security[session]
+
+Again, for Pipenv ::
+
+    $ pipenv install aiohttp_security[session]
 
 Examples
 --------
