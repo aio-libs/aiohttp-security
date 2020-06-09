@@ -1,5 +1,5 @@
 -e .
-flake8==3.8.2
+flake8==3.8.3
 async-timeout==3.0.1
 pytest==5.4.3
 pytest-cov==2.9.0
