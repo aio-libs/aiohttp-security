@@ -5,7 +5,7 @@ pytest==6.1.2
 pytest-cov==2.10.1
 pytest-mock==3.3.1
 coverage==5.3
-sphinx==3.2.1
+sphinx==3.3.0
 pep257==0.7.0
 aiohttp-session==2.9.0
 aiopg[sa]==1.0.0
