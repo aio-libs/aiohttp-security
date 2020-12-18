@@ -3,15 +3,6 @@ name: Test tesla_api
 on: pull_request
 
 jobs:
-  mypy:
-    name: Check annotations with Mypy
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-      - run: pip install aiohttp mypy
-      - run: mypy
-
   test:
     name: Tests
     runs-on: ubuntu-latest
