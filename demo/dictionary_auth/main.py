@@ -11,9 +11,9 @@ from demo.dictionary_auth.handlers import configure_handlers
 from demo.dictionary_auth.users import user_map
 
 
-def make_app():
+def make_app() -> web.Application:
     app = web.Application()
-    app.user_map = user_map
+    app['user_map'] = user_map
     configure_handlers(app)
 
     # secret_key must be 32 url-safe base64-encoded bytes

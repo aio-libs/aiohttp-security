@@ -1,5 +1,7 @@
-import sqlalchemy as sa
+from enum import Enum
+from typing import Any, Optional, Union
 
+import sqlalchemy as sa
 from aiohttp_security.abc import AbstractAuthorizationPolicy
 from passlib.hash import sha256_crypt
 
@@ -7,13 +9,13 @@ from . import db
 
 
 class DBAuthorizationPolicy(AbstractAuthorizationPolicy):
-    def __init__(self, dbengine):
+    def __init__(self, dbengine: Any):
         self.dbengine = dbengine
 
-    async def authorized_userid(self, identity):
+    async def authorized_userid(self, identity: str) -> Optional[str]:
         async with self.dbengine.acquire() as conn:
             where = sa.and_(db.users.c.login == identity,
-                            sa.not_(db.users.c.disabled))
+                            sa.not_(db.users.c.disabled))  # type: ignore[no-untyped-call]
             query = db.users.count().where(where)
             ret = await conn.scalar(query)
             if ret:
@@ -21,13 +23,11 @@ class DBAuthorizationPolicy(AbstractAuthorizationPolicy):
             else:
                 return None
 
-    async def permits(self, identity, permission, context=None):
-        if identity is None:
-            return False
-
+    async def permits(self, identity: str, permission: Union[str, Enum],
+                      context: None = None) -> bool:
         async with self.dbengine.acquire() as conn:
             where = sa.and_(db.users.c.login == identity,
-                            sa.not_(db.users.c.disabled))
+                            sa.not_(db.users.c.disabled))  # type: ignore[no-untyped-call]
             query = db.users.select().where(where)
             ret = await conn.execute(query)
             user = await ret.fetchone()
@@ -49,14 +49,14 @@ class DBAuthorizationPolicy(AbstractAuthorizationPolicy):
             return False
 
 
-async def check_credentials(db_engine, username, password):
+async def check_credentials(db_engine: Any, username: str, password: str) -> bool:
     async with db_engine.acquire() as conn:
         where = sa.and_(db.users.c.login == username,
-                        sa.not_(db.users.c.disabled))
+                        sa.not_(db.users.c.disabled))  # type: ignore[no-untyped-call]
         query = db.users.select().where(where)
         ret = await conn.execute(query)
         user = await ret.fetchone()
         if user is not None:
             hashed = user[2]
-            return sha256_crypt.verify(password, hashed)
+            return sha256_crypt.verify(password, hashed)  # type: ignore[no-any-return]
     return False

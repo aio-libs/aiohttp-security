@@ -1,6 +1,11 @@
-from collections import namedtuple
+from typing import NamedTuple, Tuple
 
-User = namedtuple('User', ['username', 'password', 'permissions'])
+
+class User(NamedTuple):
+    username: str
+    password: str
+    permissions: Tuple[str, ...]
+
 
 user_map = {
     user.username: user for user in [

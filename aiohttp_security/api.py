@@ -1,15 +1,23 @@
 import enum
 import warnings
-from aiohttp import web
-from aiohttp_security.abc import (AbstractIdentityPolicy,
-                                  AbstractAuthorizationPolicy)
 from functools import wraps
+from typing import Any, Callable, Optional, TypeVar, Union
+
+from aiohttp import web
+from aiohttp_security.abc import AbstractAuthorizationPolicy, AbstractIdentityPolicy
 
 IDENTITY_KEY = 'aiohttp_security_identity_policy'
 AUTZ_KEY = 'aiohttp_security_autz_policy'
 
+# _AIP/_AAP are shorthand for Optional[policy] when we retrieve from request.
+_AAP = Optional[AbstractAuthorizationPolicy]
+_AIP = Optional[AbstractIdentityPolicy]
+_Handler = TypeVar('_Handler', bound=Union[Callable[[web.Request], Any],
+                                           Callable[[object, web.Request], Any]])
 
-async def remember(request, response, identity, **kwargs):
+
+async def remember(request: web.Request, response: web.StreamResponse,
+                   identity: str, **kwargs: Any) -> None:
     """Remember identity into response.
 
     The action is performed by identity_policy.remember()
@@ -30,7 +38,7 @@ async def remember(request, response, identity, **kwargs):
     await identity_policy.remember(request, response, identity, **kwargs)
 
 
-async def forget(request, response):
+async def forget(request: web.Request, response: web.StreamResponse) -> None:
     """Forget previously remembered identity.
 
     Usually it clears cookie or server-side storage to forget user
@@ -47,9 +55,9 @@ async def forget(request, response):
     await identity_policy.forget(request, response)
 
 
-async def authorized_userid(request):
-    identity_policy = request.config_dict.get(IDENTITY_KEY)
-    autz_policy = request.config_dict.get(AUTZ_KEY)
+async def authorized_userid(request: web.Request) -> Optional[str]:
+    identity_policy: _AIP = request.config_dict.get(IDENTITY_KEY)
+    autz_policy: _AAP = request.config_dict.get(AUTZ_KEY)
     if identity_policy is None or autz_policy is None:
         return None
     identity = await identity_policy.identify(request)
@@ -59,20 +67,21 @@ async def authorized_userid(request):
     return user_id
 
 
-async def permits(request, permission, context=None):
+async def permits(request: web.Request, permission: Union[str, enum.Enum],
+                  context: Any = None) -> bool:
     assert isinstance(permission, (str, enum.Enum)), permission
     assert permission
-    identity_policy = request.config_dict.get(IDENTITY_KEY)
-    autz_policy = request.config_dict.get(AUTZ_KEY)
+    identity_policy: _AIP = request.config_dict.get(IDENTITY_KEY)
+    autz_policy: _AAP = request.config_dict.get(AUTZ_KEY)
     if identity_policy is None or autz_policy is None:
         return True
     identity = await identity_policy.identify(request)
-    # non-registered user still may has some permissions
+    # non-registered user still may have some permissions
     access = await autz_policy.permits(identity, permission, context)
     return access
 
 
-async def is_anonymous(request):
+async def is_anonymous(request: web.Request) -> bool:
     """Check if user is anonymous.
 
     User is considered anonymous if there is not identity
@@ -87,7 +96,7 @@ async def is_anonymous(request):
     return False
 
 
-async def check_authorized(request):
+async def check_authorized(request: web.Request) -> str:
     """Checker that raises HTTPUnauthorized for anonymous users.
     """
     userid = await authorized_userid(request)
@@ -96,31 +105,32 @@ async def check_authorized(request):
     return userid
 
 
-def login_required(fn):
+def login_required(fn: _Handler) -> _Handler:
     """Decorator that restrict access only for authorized users.
 
     User is considered authorized if authorized_userid
     returns some value.
     """
     @wraps(fn)
-    async def wrapped(*args, **kwargs):
+    async def wrapped(*args: Union[object, web.Request]) -> Any:
         request = args[-1]
-        if not isinstance(request, web.BaseRequest):
+        if not isinstance(request, web.Request):
             msg = ("Incorrect decorator usage. "
                    "Expecting `def handler(request)` "
                    "or `def handler(self, request)`.")
             raise RuntimeError(msg)
 
         await check_authorized(request)
-        return await fn(*args, **kwargs)
+        return await fn(*args)  # type: ignore[arg-type]
 
     warnings.warn("login_required decorator is deprecated, "
                   "use check_authorized instead",
                   DeprecationWarning)
-    return wrapped
+    return wrapped  # type: ignore[return-value]
 
 
-async def check_permission(request, permission, context=None):
+async def check_permission(request: web.Request, permission: Union[str, enum.Enum],
+                           context: Any = None) -> None:
     """Checker that passes only to authoraised users with given permission.
 
     If user is not authorized - raises HTTPUnauthorized,
@@ -134,10 +144,7 @@ async def check_permission(request, permission, context=None):
         raise web.HTTPForbidden()
 
 
-def has_permission(
-    permission,
-    context=None,
-):
+def has_permission(permission: Union[str, enum.Enum], context: Any = None):  # type: ignore
     """Decorator that restricts access only for authorized users
     with correct permissions.
 
@@ -145,11 +152,11 @@ def has_permission(
     if user is authorized and does not have permission -
     raises HTTPForbidden.
     """
-    def wrapper(fn):
+    def wrapper(fn):  # type: ignore
         @wraps(fn)
-        async def wrapped(*args, **kwargs):
+        async def wrapped(*args, **kwargs):  # type: ignore
             request = args[-1]
-            if not isinstance(request, web.BaseRequest):
+            if not isinstance(request, web.Request):
                 msg = ("Incorrect decorator usage. "
                        "Expecting `def handler(request)` "
                        "or `def handler(self, request)`.")
@@ -166,7 +173,8 @@ def has_permission(
     return wrapper
 
 
-def setup(app, identity_policy, autz_policy):
+def setup(app: web.Application, identity_policy: AbstractIdentityPolicy,
+          autz_policy: AbstractAuthorizationPolicy) -> None:
     assert isinstance(identity_policy, AbstractIdentityPolicy), identity_policy
     assert isinstance(autz_policy, AbstractAuthorizationPolicy), autz_policy
 

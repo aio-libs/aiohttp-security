@@ -1,4 +1,5 @@
 from textwrap import dedent
+from typing import Dict, NoReturn
 
 from aiohttp import web
 
@@ -8,6 +9,7 @@ from aiohttp_security import (
 )
 
 from .authz import check_credentials
+from .users import User
 
 
 index_template = dedent("""
@@ -27,7 +29,7 @@ index_template = dedent("""
 """)
 
 
-async def index(request):
+async def index(request: web.Request) -> web.Response:
     username = await authorized_userid(request)
     if username:
         template = index_template.format(
@@ -40,22 +42,26 @@ async def index(request):
     )
 
 
-async def login(request):
-    response = web.HTTPFound('/')
+async def login(request: web.Request) -> NoReturn:
+    user_map: Dict[str, User] = request.app['user_map']
+    invalid_response = web.HTTPUnauthorized(body='Invalid username / password combination')
     form = await request.post()
     username = form.get('username')
     password = form.get('password')
 
-    verified = await check_credentials(
-        request.app.user_map, username, password)
+    if not (isinstance(username, str) and isinstance(password, str)):
+        raise invalid_response
+
+    verified = await check_credentials(user_map, username, password)
     if verified:
+        response = web.HTTPFound('/')
         await remember(request, response, username)
-        return response
+        raise response
 
-    return web.HTTPUnauthorized(body='Invalid username / password combination')
+    raise invalid_response
 
 
-async def logout(request):
+async def logout(request: web.Request) -> web.Response:
     await check_authorized(request)
     response = web.Response(
         text='You have been logged out',
@@ -65,7 +71,7 @@ async def logout(request):
     return response
 
 
-async def internal_page(request):
+async def internal_page(request: web.Request) -> web.Response:
     await check_permission(request, 'public')
     response = web.Response(
         text='This page is visible for all registered users',
@@ -74,7 +80,7 @@ async def internal_page(request):
     return response
 
 
-async def protected_page(request):
+async def protected_page(request: web.Request) -> web.Response:
     await check_permission(request, 'protected')
     response = web.Response(
         text='You are on protected page',
@@ -83,7 +89,7 @@ async def protected_page(request):
     return response
 
 
-def configure_handlers(app):
+def configure_handlers(app: web.Application) -> None:
     router = app.router
     router.add_get('/', index, name='index')
     router.add_post('/login', login, name='login')

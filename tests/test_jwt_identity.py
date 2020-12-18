@@ -67,7 +67,7 @@ async def test_identify_broken_scheme(loop, make_token, aiohttp_client):
         try:
             await policy.identify(request)
         except ValueError as exc:
-            raise web.HTTPBadRequest(reason=exc)
+            raise web.HTTPBadRequest(reason=str(exc))
 
         return web.Response()
 

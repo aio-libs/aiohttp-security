@@ -1,3 +1,6 @@
+from enum import Enum
+from typing import NoReturn, Optional, Union
+
 from aiohttp import web
 from aiohttp_session import SimpleCookieStorage, session_middleware
 from aiohttp_security import check_permission, \
@@ -11,15 +14,15 @@ from aiohttp_security.abc import AbstractAuthorizationPolicy
 # For more complicated authorization policies see examples
 # in the 'demo' directory.
 class SimpleJack_AuthorizationPolicy(AbstractAuthorizationPolicy):
-    async def authorized_userid(self, identity):
+    async def authorized_userid(self, identity: str) -> Optional[str]:
         """Retrieve authorized user id.
         Return the user_id of the user identified by the identity
         or 'None' if no user exists related to the identity.
         """
-        if identity == 'jack':
-            return identity
+        return identity if identity == 'jack' else None
 
-    async def permits(self, identity, permission, context=None):
+    async def permits(self, identity: str, permission: Union[str, Enum],
+                      context: None = None) -> bool:
         """Check user permissions.
         Return True if the identity is allowed the permission
         in the current context, else return False.
@@ -27,7 +30,7 @@ class SimpleJack_AuthorizationPolicy(AbstractAuthorizationPolicy):
         return identity == 'jack' and permission in ('listen',)
 
 
-async def handler_root(request):
+async def handler_root(request: web.Request) -> web.Response:
     is_logged = not await is_anonymous(request)
     return web.Response(text='''<html><head></head><body>
             Hello, I'm Jack, I'm {logged} logged in.<br /><br />
@@ -42,29 +45,29 @@ async def handler_root(request):
         ), content_type='text/html')
 
 
-async def handler_login_jack(request):
+async def handler_login_jack(request: web.Request) -> NoReturn:
     redirect_response = web.HTTPFound('/')
     await remember(request, redirect_response, 'jack')
     raise redirect_response
 
 
-async def handler_logout(request):
+async def handler_logout(request: web.Request) -> NoReturn:
     redirect_response = web.HTTPFound('/')
     await forget(request, redirect_response)
     raise redirect_response
 
 
-async def handler_listen(request):
+async def handler_listen(request: web.Request) -> web.Response:
     await check_permission(request, 'listen')
     return web.Response(body="I can listen!")
 
 
-async def handler_speak(request):
+async def handler_speak(request: web.Request) -> web.Response:
     await check_permission(request, 'speak')
     return web.Response(body="I can speak!")
 
 
-async def make_app():
+async def make_app() -> web.Application:
     #
     # WARNING!!!
     # Never use SimpleCookieStorage on production!!!
