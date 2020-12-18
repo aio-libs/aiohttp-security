@@ -1,4 +1,4 @@
-name: Test tesla_api
+name: Tests
 
 on: pull_request
 
