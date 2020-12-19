@@ -43,7 +43,7 @@ async def test_identify(loop, make_token, aiohttp_client):
     async def check(request):
         policy = request.app[IDENTITY_KEY]
         identity = await policy.identify(request)
-        assert 'Andrew' == identity['login']
+        assert 'Andrew' == identity
         return web.Response()
 
     app = web.Application()
