@@ -15,4 +15,4 @@ passlib==1.7.4
 cryptography==3.3.1
 aiohttp==3.7.3
 pytest-aiohttp==0.3.0
-pyjwt==1.7.1
+pyjwt==2.0.0
