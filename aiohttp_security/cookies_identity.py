@@ -4,11 +4,11 @@ Use mostly for demonstration purposes, SessionIdentityPolicy is much
 more handy.
 
 """
-
 from .abc import AbstractIdentityPolicy
 
 
-sentinel = object()
+class sentinel:
+    pass
 
 
 class CookiesIdentityPolicy(AbstractIdentityPolicy):

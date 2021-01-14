@@ -1,0 +1,13 @@
+from typing import Any, Optional
+
+import aiohttp.web
+
+from .abc import AbstractIdentityPolicy, Identity
+
+HAS_AIOHTTP_SESSION: bool
+
+class SessionIdentityPolicy(AbstractIdentityPolicy):
+    def __init__(self, session_key: str = ...) -> None: ...
+    async def identify(self, request: aiohttp.web.Request) -> Optional[Identity]: ...
+    async def remember(self, request: aiohttp.web.Request, response: aiohttp.web.StreamResponse, identity: Identity, **kwargs: Any) -> None: ...
+    async def forget(self, request: aiohttp.web.Request, response: aiohttp.web.StreamResponse) -> None: ...
