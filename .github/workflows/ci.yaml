@@ -24,6 +24,8 @@ jobs:
     - name: Run tests
       run: |
         make coverage
-    - name: Upload coverage to Codecov
-      run: |
-        codecov
+    - name: Upload coverage
+      uses: codecov/codecov-action@v1
+      with:
+        file: ./coverage.xml
+        flags: unit
