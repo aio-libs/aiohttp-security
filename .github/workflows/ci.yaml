@@ -20,7 +20,6 @@ jobs:
       run: |
         pip install --upgrade pip
         pip install -r requirements-dev.txt
-        pip install codecov
     - name: Run tests
       run: |
         make coverage
