@@ -22,8 +22,7 @@ jobs:
         python-version: ${{ env.DEFAULT_PYTHON }}
     - name: Install dependencies
       run: |
-        pip install --upgrade pip build setuptools wheel
-        pip install -r requirements-dev.txt
+        pip install --upgrade build
     - name: Build
       run: |
         python -m build
