@@ -1,0 +1,34 @@
+name: Publish to PyPI
+
+on:
+  push:
+    branches:
+      - 'master'
+    tags: [ 'v*' ]
+
+env:
+  DEFAULT_PYTHON: 3.9
+
+jobs:
+  publish:
+    name: Publish to PyPI
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ env.DEFAULT_PYTHON }}
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip build setuptools wheel
+        pip install -r requirements-dev.txt
+    - name: Build
+      run: |
+        python -m build
+        python setup.py sdist bdist_wheel
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        password: ${{ secrets.PYPI_API_TOKEN }}
