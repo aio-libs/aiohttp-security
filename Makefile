@@ -1,16 +1,16 @@
 # Some simple testing tasks (sorry, UNIX only).
 
-flake:
-	flake8 aiohttp_security tests 
+fmt format:
+	pre-commit run --all-files
 
 
-test: flake
+test:
 	py.test -s -q ./tests/
 
-vtest: flake
+vtest:
 	py.test -s ./tests/
 
-cov cover coverage: flake
+cov cover coverage:
 	py.test -s ./tests/ --cov=aiohttp_security --cov=tests --cov-report=html --cov-report=term
 	@echo "open file://`pwd`/coverage/index.html"
 
@@ -34,4 +34,4 @@ doc:
 	make -C docs html
 	@echo "open file://`pwd`/docs/_build/html/index.html"
 
-.PHONY: all build venv flake test vtest testloop cov clean doc
+.PHONY: all build venv fmt format test vtest testloop cov clean doc

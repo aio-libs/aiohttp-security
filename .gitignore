@@ -57,3 +57,5 @@ target/
 
 coverage
 .pytest_cache
+
+.python-version

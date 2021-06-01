@@ -1,7 +1,7 @@
 import sqlalchemy as sa
+from passlib.hash import sha256_crypt
 
 from aiohttp_security.abc import AbstractAuthorizationPolicy
-from passlib.hash import sha256_crypt
 
 from . import db
 
@@ -12,8 +12,7 @@ class DBAuthorizationPolicy(AbstractAuthorizationPolicy):
 
     async def authorized_userid(self, identity):
         async with self.dbengine.acquire() as conn:
-            where = sa.and_(db.users.c.login == identity,
-                            sa.not_(db.users.c.disabled))
+            where = sa.and_(db.users.c.login == identity, sa.not_(db.users.c.disabled))
             query = db.users.count().where(where)
             ret = await conn.scalar(query)
             if ret:
@@ -26,8 +25,7 @@ class DBAuthorizationPolicy(AbstractAuthorizationPolicy):
             return False
 
         async with self.dbengine.acquire() as conn:
-            where = sa.and_(db.users.c.login == identity,
-                            sa.not_(db.users.c.disabled))
+            where = sa.and_(db.users.c.login == identity, sa.not_(db.users.c.disabled))
             query = db.users.select().where(where)
             ret = await conn.execute(query)
             user = await ret.fetchone()
@@ -51,8 +49,7 @@ class DBAuthorizationPolicy(AbstractAuthorizationPolicy):
 
 async def check_credentials(db_engine, username, password):
     async with db_engine.acquire() as conn:
-        where = sa.and_(db.users.c.login == username,
-                        sa.not_(db.users.c.disabled))
+        where = sa.and_(db.users.c.login == username, sa.not_(db.users.c.disabled))
         query = db.users.select().where(where)
         ret = await conn.execute(query)
         user = await ret.fetchone()

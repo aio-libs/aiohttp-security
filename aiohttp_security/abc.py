@@ -1,10 +1,10 @@
 import abc
 
+
 # see http://plope.com/pyramid_auth_design_api_postmortem
 
 
 class AbstractIdentityPolicy(metaclass=abc.ABCMeta):
-
     @abc.abstractmethod
     async def identify(self, request):
         """Return the claimed identity of the user associated request or
@@ -24,13 +24,12 @@ class AbstractIdentityPolicy(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     async def forget(self, request, response):
-        """ Modify response which can be used to 'forget' the
+        """Modify response which can be used to 'forget' the
         current identity on subsequent requests."""
         pass
 
 
 class AbstractAuthorizationPolicy(metaclass=abc.ABCMeta):
-
     @abc.abstractmethod
     async def permits(self, identity, permission, context=None):
         """Check user permissions.

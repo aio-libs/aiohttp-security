@@ -4,20 +4,21 @@
 
 from .abc import AbstractIdentityPolicy
 
+
 try:
     import jwt
 except ImportError:  # pragma: no cover
     jwt = None
 
 
-AUTH_HEADER_NAME = 'Authorization'
-AUTH_SCHEME = 'Bearer '
+AUTH_HEADER_NAME = "Authorization"
+AUTH_SCHEME = "Bearer "
 
 
 class JWTIdentityPolicy(AbstractIdentityPolicy):
-    def __init__(self, secret, algorithm='HS256'):
+    def __init__(self, secret, algorithm="HS256"):
         if jwt is None:
-            raise RuntimeError('Please install `PyJWT`')
+            raise RuntimeError("Please install `PyJWT`")
         self.secret = secret
         self.algorithm = algorithm
 
@@ -28,14 +29,13 @@ class JWTIdentityPolicy(AbstractIdentityPolicy):
             return
 
         if not header_identity.startswith(AUTH_SCHEME):
-            raise ValueError('Invalid authorization scheme. ' +
-                             'Should be `Bearer <token>`')
+            raise ValueError(
+                "Invalid authorization scheme. " + "Should be `Bearer <token>`"
+            )
 
-        token = header_identity.split(' ')[1].strip()
+        token = header_identity.split(" ")[1].strip()
 
-        identity = jwt.decode(token,
-                              self.secret,
-                              algorithms=[self.algorithm])
+        identity = jwt.decode(token, self.secret, algorithms=[self.algorithm])
         return identity
 
     async def remember(self, *args, **kwargs):  # pragma: no cover

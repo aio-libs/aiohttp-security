@@ -1,37 +1,34 @@
 import asyncio
-
 from aiohttp import web
 from aiohttp_session import setup as setup_session
 from aiohttp_session.redis_storage import RedisStorage
-from aiohttp_security import setup as setup_security
-from aiohttp_security import SessionIdentityPolicy
 from aiopg.sa import create_engine
 from aioredis import create_pool
 
-
+from aiohttp_security import SessionIdentityPolicy, setup as setup_security
 from demo.database_auth.db_auth import DBAuthorizationPolicy
 from demo.database_auth.handlers import Web
 
 
 async def init(loop):
-    redis_pool = await create_pool(('localhost', 6379))
-    db_engine = await create_engine(user='aiohttp_security',
-                                    password='aiohttp_security',
-                                    database='aiohttp_security',
-                                    host='127.0.0.1')
+    redis_pool = await create_pool(("localhost", 6379))
+    db_engine = await create_engine(
+        user="aiohttp_security",
+        password="aiohttp_security",
+        database="aiohttp_security",
+        host="127.0.0.1",
+    )
     app = web.Application()
     app.db_engine = db_engine
     setup_session(app, RedisStorage(redis_pool))
-    setup_security(app,
-                   SessionIdentityPolicy(),
-                   DBAuthorizationPolicy(db_engine))
+    setup_security(app, SessionIdentityPolicy(), DBAuthorizationPolicy(db_engine))
 
     web_handlers = Web()
     web_handlers.configure(app)
 
     handler = app.make_handler()
-    srv = await loop.create_server(handler, '127.0.0.1', 8080)
-    print('Server started at http://127.0.0.1:8080')
+    srv = await loop.create_server(handler, "127.0.0.1", 8080)
+    print("Server started at http://127.0.0.1:8080")
     return srv, app, handler
 
 
@@ -52,8 +49,8 @@ def main():
     try:
         loop.run_forever()
     except KeyboardInterrupt:
-        loop.run_until_complete((finalize(srv, app, handler)))
+        loop.run_until_complete(finalize(srv, app, handler))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,12 +1,13 @@
 import enum
 import warnings
 from aiohttp import web
-from aiohttp_security.abc import (AbstractIdentityPolicy,
-                                  AbstractAuthorizationPolicy)
 from functools import wraps
 
-IDENTITY_KEY = 'aiohttp_security_identity_policy'
-AUTZ_KEY = 'aiohttp_security_autz_policy'
+from aiohttp_security.abc import AbstractAuthorizationPolicy, AbstractIdentityPolicy
+
+
+IDENTITY_KEY = "aiohttp_security_identity_policy"
+AUTZ_KEY = "aiohttp_security_autz_policy"
 
 
 async def remember(request, response, identity, **kwargs):
@@ -21,8 +22,10 @@ async def remember(request, response, identity, **kwargs):
     assert identity
     identity_policy = request.config_dict.get(IDENTITY_KEY)
     if identity_policy is None:
-        text = ("Security subsystem is not initialized, "
-                "call aiohttp_security.setup(...) first")
+        text = (
+            "Security subsystem is not initialized, "
+            "call aiohttp_security.setup(...) first"
+        )
         # in order to see meaningful exception message both: on console
         # output and rendered page we add same message to *reason* and
         # *text* arguments.
@@ -38,8 +41,10 @@ async def forget(request, response):
     """
     identity_policy = request.config_dict.get(IDENTITY_KEY)
     if identity_policy is None:
-        text = ("Security subsystem is not initialized, "
-                "call aiohttp_security.setup(...) first")
+        text = (
+            "Security subsystem is not initialized, "
+            "call aiohttp_security.setup(...) first"
+        )
         # in order to see meaningful exception message both: on console
         # output and rendered page we add same message to *reason* and
         # *text* arguments.
@@ -88,8 +93,7 @@ async def is_anonymous(request):
 
 
 async def check_authorized(request):
-    """Checker that raises HTTPUnauthorized for anonymous users.
-    """
+    """Checker that raises HTTPUnauthorized for anonymous users."""
     userid = await authorized_userid(request)
     if userid is None:
         raise web.HTTPUnauthorized()
@@ -102,21 +106,25 @@ def login_required(fn):
     User is considered authorized if authorized_userid
     returns some value.
     """
+
     @wraps(fn)
     async def wrapped(*args, **kwargs):
         request = args[-1]
         if not isinstance(request, web.BaseRequest):
-            msg = ("Incorrect decorator usage. "
-                   "Expecting `def handler(request)` "
-                   "or `def handler(self, request)`.")
+            msg = (
+                "Incorrect decorator usage. "
+                "Expecting `def handler(request)` "
+                "or `def handler(self, request)`."
+            )
             raise RuntimeError(msg)
 
         await check_authorized(request)
         return await fn(*args, **kwargs)
 
-    warnings.warn("login_required decorator is deprecated, "
-                  "use check_authorized instead",
-                  DeprecationWarning)
+    warnings.warn(
+        "login_required decorator is deprecated, " "use check_authorized instead",
+        DeprecationWarning,
+    )
     return wrapped
 
 
@@ -145,14 +153,17 @@ def has_permission(
     if user is authorized and does not have permission -
     raises HTTPForbidden.
     """
+
     def wrapper(fn):
         @wraps(fn)
         async def wrapped(*args, **kwargs):
             request = args[-1]
             if not isinstance(request, web.BaseRequest):
-                msg = ("Incorrect decorator usage. "
-                       "Expecting `def handler(request)` "
-                       "or `def handler(self, request)`.")
+                msg = (
+                    "Incorrect decorator usage. "
+                    "Expecting `def handler(request)` "
+                    "or `def handler(self, request)`."
+                )
                 raise RuntimeError(msg)
 
             await check_permission(request, permission, context)
@@ -160,9 +171,10 @@ def has_permission(
 
         return wrapped
 
-    warnings.warn("has_permission decorator is deprecated, "
-                  "use check_permission instead",
-                  DeprecationWarning)
+    warnings.warn(
+        "has_permission decorator is deprecated, " "use check_permission instead",
+        DeprecationWarning,
+    )
     return wrapper
 
 
