@@ -31,3 +31,7 @@ updates:
   - dependency-name: pytest-mock
     versions:
     - 3.5.1
+- package-ecosystem: "github-actions"
+  directory: "/"
+  schedule:
+    interval: "daily"
