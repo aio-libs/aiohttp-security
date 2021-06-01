@@ -1,6 +1,6 @@
 # Some simple testing tasks (sorry, UNIX only).
 
-fmt format:
+fmt format lint:
 	pre-commit run --all-files
 
 
@@ -34,4 +34,4 @@ doc:
 	make -C docs html
 	@echo "open file://`pwd`/docs/_build/html/index.html"
 
-.PHONY: all build venv fmt format test vtest testloop cov clean doc
+.PHONY: all build venv fmt format lint test vtest testloop cov clean doc
