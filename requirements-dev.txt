@@ -4,7 +4,7 @@ async-timeout==3.0.1
 pytest==6.2.5
 pytest-cov==2.10.1
 pytest-mock==3.4.0
-coverage==5.3.1
+coverage==6.1.2
 sphinx==4.3.0
 pep257==0.7.0
 aiohttp-session==2.9.0
