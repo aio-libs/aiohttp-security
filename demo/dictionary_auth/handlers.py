@@ -2,11 +2,7 @@ from textwrap import dedent
 
 from aiohttp import web
 
-from aiohttp_security import (
-    remember, forget, authorized_userid,
-    check_permission, check_authorized,
-)
-
+from aiohttp_security import authorized_userid, check_authorized, check_permission, forget, remember
 from .authz import check_credentials
 
 
