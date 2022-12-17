@@ -6,18 +6,12 @@ from typing import Any, Callable, Optional, TypeVar, Union
 from aiohttp import web
 from aiohttp_security.abc import AbstractAuthorizationPolicy, AbstractIdentityPolicy
 
-from aiohttp import web
-
-from aiohttp_security.abc import AbstractAuthorizationPolicy, AbstractIdentityPolicy
-
 IDENTITY_KEY = 'aiohttp_security_identity_policy'
 AUTZ_KEY = 'aiohttp_security_autz_policy'
 
 # _AIP/_AAP are shorthand for Optional[policy] when we retrieve from request.
 _AAP = Optional[AbstractAuthorizationPolicy]
 _AIP = Optional[AbstractIdentityPolicy]
-_Handler = TypeVar("_Handler", bound=Union[Callable[[web.Request], Any],
-                                           Callable[[object, web.Request], Any]])
 
 
 async def remember(request: web.Request, response: web.StreamResponse,
@@ -109,30 +103,6 @@ async def check_authorized(request: web.Request) -> str:
     return userid
 
 
-def login_required(fn: _Handler) -> _Handler:
-    """Decorator that restrict access only for authorized users.
-
-    User is considered authorized if authorized_userid
-    returns some value.
-    """
-    @wraps(fn)
-    async def wrapped(*args: Union[object, web.Request]) -> Any:
-        request = args[-1]
-        if not isinstance(request, web.Request):
-            msg = ("Incorrect decorator usage. "
-                   "Expecting `def handler(request)` "
-                   "or `def handler(self, request)`.")
-            raise RuntimeError(msg)
-
-        await check_authorized(request)
-        return await fn(*args)  # type: ignore[arg-type]
-
-    warnings.warn("login_required decorator is deprecated, "
-                  "use check_authorized instead",
-                  DeprecationWarning)
-    return wrapped  # type: ignore[return-value]
-
-
 async def check_permission(request: web.Request, permission: Union[str, enum.Enum],
                            context: Any = None) -> None:
     """Checker that passes only to authoraised users with given permission.
@@ -146,35 +116,6 @@ async def check_permission(request: web.Request, permission: Union[str, enum.Enu
     allowed = await permits(request, permission, context)
     if not allowed:
         raise web.HTTPForbidden()
-
-
-def has_permission(permission: Union[str, enum.Enum], context: Any = None):  # type: ignore
-    """Decorator that restricts access only for authorized users
-    with correct permissions.
-
-    If user is not authorized - raises HTTPUnauthorized,
-    if user is authorized and does not have permission -
-    raises HTTPForbidden.
-    """
-    def wrapper(fn):  # type: ignore
-        @wraps(fn)
-        async def wrapped(*args, **kwargs):  # type: ignore
-            request = args[-1]
-            if not isinstance(request, web.Request):
-                msg = ("Incorrect decorator usage. "
-                       "Expecting `def handler(request)` "
-                       "or `def handler(self, request)`.")
-                raise RuntimeError(msg)
-
-            await check_permission(request, permission, context)
-            return await fn(*args, **kwargs)
-
-        return wrapped
-
-    warnings.warn("has_permission decorator is deprecated, "
-                  "use check_permission instead",
-                  DeprecationWarning)
-    return wrapper
 
 
 def setup(app: web.Application, identity_policy: AbstractIdentityPolicy,
