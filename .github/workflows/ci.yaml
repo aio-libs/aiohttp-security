@@ -81,7 +81,7 @@ jobs:
   check:  # This job does nothing and is only used for the branch protection
     if: always()
 
-    needs: [test]
+    needs: [lint, test]
 
     runs-on: ubuntu-latest
 
