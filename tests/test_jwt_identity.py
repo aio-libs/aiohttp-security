@@ -51,7 +51,7 @@ async def test_identify(loop, make_token, aiohttp_client):
     app.router.add_route('GET', '/', check)
 
     client = await aiohttp_client(app)
-    headers = {'Authorization': 'Bearer {}'.format(token.decode('utf-8'))}
+    headers = {"Authorization": "Bearer {}".format(token)}
     resp = await client.get('/', headers=headers)
     assert 200 == resp.status
 
