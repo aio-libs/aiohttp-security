@@ -1,4 +1,4 @@
-name: Tests
+name: CI
 
 on:
   push:
@@ -15,7 +15,6 @@ jobs:
   test:
     name: Tests
     runs-on: ubuntu-latest
-    continue-on-error: ${{ matrix.experimental }}
     strategy:
       matrix:
         pyver: ['3.7', '3.8', '3.9', '3.10', '3.11']
