@@ -1,6 +1,7 @@
 -e .
 aiohttp==3.8.3
 async-timeout==4.0.2
+coverage==6.5.0
 cryptography==38.0.4
 flake8==5.0.4
 flake8-bandit==4.1.1
@@ -8,10 +9,10 @@ flake8-bugbear==22.12.6
 flake8-import-order==0.18.2
 flake8-requirements==1.7.5
 mypy==0.991
+pyjwt==2.6.0
 pytest==6.2.5
 pytest-cov==3.0.0
 pytest-mock==3.6.1
-coverage==6.2
 sphinx==4.3.2
 sqlalchemy==1.4.45
 sqlalchemy-stubs==0.4
@@ -23,4 +24,3 @@ aioredis==2.0.1
 hiredis==2.0.0
 passlib==1.7.4
 pytest-aiohttp==1.0.4
-pyjwt==2.3.0
