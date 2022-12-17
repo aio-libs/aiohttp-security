@@ -14,8 +14,8 @@ from .handlers import Web
 
 async def init(loop):
     redis_pool = await create_pool(('localhost', 6379))
-    db_engine = await create_engine(
-        user="aiohttp_security", password="aiohttp_security",  # noqa: S106
+    db_engine = await create_engine(  # noqa: S106
+        user="aiohttp_security", password="aiohttp_security",
         database="aiohttp_security", host="127.0.0.1")
     app = web.Application()
     app.db_engine = db_engine
