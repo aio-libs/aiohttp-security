@@ -1,5 +1,6 @@
 -e .
 aiohttp==3.8.3
+aiopg[sa]==1.4.0
 async-timeout==4.0.2
 coverage==6.5.0
 cryptography==38.0.4
@@ -19,7 +20,6 @@ sqlalchemy-stubs==0.4
 types-passlib==1.7.7.3
 pep257==0.7.0
 aiohttp-session==2.10.0
-aiopg[sa]==1.4.0
 aioredis==2.0.1
 hiredis==2.0.0
 passlib==1.7.4
