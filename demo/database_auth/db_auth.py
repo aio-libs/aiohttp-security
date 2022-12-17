@@ -1,8 +1,8 @@
 import sqlalchemy as sa
 
-from aiohttp_security.abc import AbstractAuthorizationPolicy
 from passlib.hash import sha256_crypt
 
+from aiohttp_security.abc import AbstractAuthorizationPolicy
 from . import db
 
 
