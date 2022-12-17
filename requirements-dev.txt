@@ -7,6 +7,7 @@ flake8-bugbear==22.12.6
 flake8-import-order==0.18.2
 flake8-requirements==1.7.5
 mypy==0.991
+passlib==1.7.7.3
 pytest==6.2.5
 pytest-cov==3.0.0
 pytest-mock==3.6.1
