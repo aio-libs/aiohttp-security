@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Dict, Optional, Union
+from typing import Mapping, Optional, Union
 
 from aiohttp_security.abc import AbstractAuthorizationPolicy
 
@@ -7,7 +7,7 @@ from .users import User
 
 
 class DictionaryAuthorizationPolicy(AbstractAuthorizationPolicy):
-    def __init__(self, user_map: Dict[str, User]):
+    def __init__(self, user_map: Mapping[Optional[str], User]):
         super().__init__()
         self.user_map = user_map
 
@@ -18,20 +18,19 @@ class DictionaryAuthorizationPolicy(AbstractAuthorizationPolicy):
         """
         return identity if identity in self.user_map else None
 
-    async def permits(self, identity: str, permission: Union[str, Enum],
+    async def permits(self, identity: Optional[str], permission: Union[str, Enum],
                       context: None = None) -> bool:
         """Check user permissions.
         Return True if the identity is allowed the permission in the
         current context, else return False.
         """
-        # pylint: disable=unused-argument
         user = self.user_map.get(identity)
         if not user:
             return False
         return permission in user.permissions
 
 
-async def check_credentials(user_map: Dict[str, User], username: str, password: str) -> bool:
+async def check_credentials(user_map: Mapping[Optional[str], User], username: str, password: str) -> bool:
     user = user_map.get(username)
     if not user:
         return False

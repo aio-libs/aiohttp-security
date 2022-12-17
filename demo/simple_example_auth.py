@@ -21,7 +21,7 @@ class SimpleJack_AuthorizationPolicy(AbstractAuthorizationPolicy):
         """
         return identity if identity == "jack" else None
 
-    async def permits(self, identity: str, permission: Union[str, Enum],
+    async def permits(self, identity: Optional[str], permission: Union[str, Enum],
                       context: None = None) -> bool:
         """Check user permissions.
         Return True if the identity is allowed the permission

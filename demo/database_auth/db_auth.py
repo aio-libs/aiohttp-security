@@ -23,7 +23,7 @@ class DBAuthorizationPolicy(AbstractAuthorizationPolicy):
             else:
                 return None
 
-    async def permits(self, identity: str, permission: Union[str, Enum],
+    async def permits(self, identity: Optional[str], permission: Union[str, Enum],
                       context: None = None) -> bool:
         async with self.dbengine.acquire() as conn:
             where = sa.and_(db.users.c.login == identity,

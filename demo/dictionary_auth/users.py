@@ -1,4 +1,4 @@
-from typing import NamedTuple, Tuple
+from typing import Dict, NamedTuple, Optional, Tuple
 
 
 class User(NamedTuple):
@@ -7,7 +7,7 @@ class User(NamedTuple):
     permissions: Tuple[str, ...]
 
 
-user_map = {
+user_map: Dict[Optional[str], User] = {
     user.username: user for user in [
         User('devin', 'password', ('public',)),
         User('jack', 'password', ('public', 'protected',)),

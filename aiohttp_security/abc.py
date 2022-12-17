@@ -37,7 +37,7 @@ class AbstractIdentityPolicy(metaclass=abc.ABCMeta):
 class AbstractAuthorizationPolicy(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
-    async def permits(self, identity: str, permission: Union[str, Enum],
+    async def permits(self, identity: Optional[str], permission: Union[str, Enum],
                       context: Any = None) -> bool:
         """Check user permissions.
 
