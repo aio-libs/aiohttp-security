@@ -1,6 +1,5 @@
 import enum
 
-import pytest
 from aiohttp import web
 
 from aiohttp_security import (

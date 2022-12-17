@@ -13,7 +13,8 @@ from .db_auth import DBAuthorizationPolicy
 from .handlers import Web
 
 
-async def init(loop: asyncio.AbstractEventLoop) -> Tuple[asyncio.Server, web.Application, web.Server]:
+async def init(loop: asyncio.AbstractEventLoop) -> Tuple[asyncio.Server, web.Application,
+                                                         web.Server]:
     redis_pool = await create_pool(('localhost', 6379))
     db_engine = await create_engine(  # noqa: S106
         user="aiohttp_security", password="aiohttp_security",

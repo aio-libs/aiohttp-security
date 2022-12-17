@@ -5,8 +5,9 @@ more handy.
 
 """
 
-from aiohttp import web
 from typing import Any, NewType, Optional, Union, cast
+
+from aiohttp import web
 
 from .abc import AbstractIdentityPolicy
 

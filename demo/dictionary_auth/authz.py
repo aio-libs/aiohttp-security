@@ -2,7 +2,6 @@ from enum import Enum
 from typing import Mapping, Optional, Union
 
 from aiohttp_security.abc import AbstractAuthorizationPolicy
-
 from .users import User
 
 
@@ -30,7 +29,8 @@ class DictionaryAuthorizationPolicy(AbstractAuthorizationPolicy):
         return permission in user.permissions
 
 
-async def check_credentials(user_map: Mapping[Optional[str], User], username: str, password: str) -> bool:
+async def check_credentials(user_map: Mapping[Optional[str], User], username: str,
+                            password: str) -> bool:
     user = user_map.get(username)
     if not user:
         return False

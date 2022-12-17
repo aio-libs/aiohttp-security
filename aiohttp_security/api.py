@@ -1,9 +1,8 @@
 import enum
-import warnings
-from functools import wraps
-from typing import Any, Callable, Optional, TypeVar, Union
+from typing import Any, Optional, Union
 
 from aiohttp import web
+
 from aiohttp_security.abc import AbstractAuthorizationPolicy, AbstractIdentityPolicy
 
 IDENTITY_KEY = 'aiohttp_security_identity_policy'

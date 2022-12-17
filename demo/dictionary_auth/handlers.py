@@ -1,5 +1,5 @@
 from textwrap import dedent
-from typing import Dict, Optional, NoReturn
+from typing import Dict, NoReturn, Optional
 
 from aiohttp import web
 
