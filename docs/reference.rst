@@ -147,35 +147,6 @@ Public API functions
    :param request: :class:`aiohttp.web.Request` object.
 
 
-.. decorator:: login_required
-
-   Decorator for handlers that checks if user is authorized.
-
-   Raises :class:`aiohttp.web.HTTPUnauthorized` if user is not authorized.
-
-   .. deprecated:: 0.3
-
-      Use :func:`check_authorized` async function.
-
-
-.. decorator:: has_permission(permission)
-
-   Decorator for handlers that checks if user is authorized
-   and has correct permission.
-
-   Raises :class:`aiohttp.web.HTTPUnauthorized` if user is not
-   authorized.
-
-   Raises :class:`aiohttp.web.HTTPForbidden` if user is
-   authorized but has no access rights.
-
-   :param str permission: requested :term:`permission`.
-
-   .. deprecated:: 0.3
-
-      Use :func:`check_authorized` async function.
-
-
 Abstract policies
 =================
 

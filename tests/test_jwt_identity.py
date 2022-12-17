@@ -30,7 +30,7 @@ class Autz(AbstractAuthorizationPolicy):
 
 
 async def test_no_pyjwt_installed(mocker):
-    mocker.patch('aiohttp_security.jwt_identity.jwt', None)
+    mocker.patch("aiohttp_security.jwt_identity.HAS_JWT", False)
     with pytest.raises(RuntimeError):
         JWTIdentityPolicy('secret')
 
@@ -43,7 +43,7 @@ async def test_identify(loop, make_token, aiohttp_client):
     async def check(request):
         policy = request.app[IDENTITY_KEY]
         identity = await policy.identify(request)
-        assert 'Andrew' == identity['login']
+        assert "Andrew" == identity
         return web.Response()
 
     app = web.Application()
@@ -67,7 +67,7 @@ async def test_identify_broken_scheme(loop, make_token, aiohttp_client):
         try:
             await policy.identify(request)
         except ValueError as exc:
-            raise web.HTTPBadRequest(reason=exc)
+            raise web.HTTPBadRequest(reason=str(exc))
 
         return web.Response()
 

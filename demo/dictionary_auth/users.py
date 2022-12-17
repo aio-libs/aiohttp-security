@@ -1,8 +1,13 @@
-from collections import namedtuple
+from typing import Dict, NamedTuple, Optional, Tuple
 
-User = namedtuple('User', ['username', 'password', 'permissions'])
 
-user_map = {
+class User(NamedTuple):
+    username: str
+    password: str
+    permissions: Tuple[str, ...]
+
+
+user_map: Dict[Optional[str], User] = {
     user.username: user for user in [
         User('devin', 'password', ('public',)),
         User('jack', 'password', ('public', 'protected',)),

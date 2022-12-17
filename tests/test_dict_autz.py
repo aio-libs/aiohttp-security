@@ -1,11 +1,10 @@
 import enum
 
-import pytest
 from aiohttp import web
 
 from aiohttp_security import (
     AbstractAuthorizationPolicy, authorized_userid, check_authorized, check_permission, forget,
-    has_permission, is_anonymous, login_required, permits, remember)
+    is_anonymous, permits, remember)
 from aiohttp_security import setup as _setup
 from aiohttp_security.cookies_identity import CookiesIdentityPolicy
 
@@ -163,40 +162,6 @@ async def test_is_anonymous(loop, aiohttp_client):
     assert web.HTTPUnauthorized.status_code == resp.status
 
 
-async def test_login_required(loop, aiohttp_client):
-    @login_required
-    async def index(request):
-        return web.Response()
-
-    async def login(request):
-        response = web.HTTPFound(location="/")
-        await remember(request, response, "UserID")
-        raise response
-
-    async def logout(request):
-        response = web.HTTPFound(location="/")
-        await forget(request, response)
-        raise response
-
-    app = web.Application()
-    _setup(app, CookiesIdentityPolicy(), Autz())
-    app.router.add_route("GET", "/", index)
-    app.router.add_route("POST", "/login", login)
-    app.router.add_route("POST", "/logout", logout)
-
-    client = await aiohttp_client(app)
-    resp = await client.get("/")
-    assert web.HTTPUnauthorized.status_code == resp.status
-
-    await client.post("/login")
-    resp = await client.get("/")
-    assert web.HTTPOk.status_code == resp.status
-
-    await client.post("/logout")
-    resp = await client.get("/")
-    assert web.HTTPUnauthorized.status_code == resp.status
-
-
 async def test_check_authorized(loop, aiohttp_client):
     async def index(request):
         await check_authorized(request)
@@ -228,65 +193,6 @@ async def test_check_authorized(loop, aiohttp_client):
     await client.post('/logout')
     resp = await client.get('/')
     assert web.HTTPUnauthorized.status_code == resp.status
-
-
-async def test_has_permission(loop, aiohttp_client):
-
-    with pytest.warns(DeprecationWarning):
-
-        @has_permission('read')
-        async def index_read(request):
-            return web.Response()
-
-        @has_permission('write')
-        async def index_write(request):
-            return web.Response()
-
-        @has_permission('forbid')
-        async def index_forbid(request):
-            return web.Response()
-
-        async def login(request):
-            response = web.HTTPFound(location='/')
-            await remember(request, response, 'UserID')
-            return response
-
-        async def logout(request):
-            response = web.HTTPFound(location='/')
-            await forget(request, response)
-            raise response
-
-        app = web.Application()
-        _setup(app, CookiesIdentityPolicy(), Autz())
-        app.router.add_route('GET', '/permission/read', index_read)
-        app.router.add_route('GET', '/permission/write', index_write)
-        app.router.add_route('GET', '/permission/forbid', index_forbid)
-        app.router.add_route('POST', '/login', login)
-        app.router.add_route('POST', '/logout', logout)
-        client = await aiohttp_client(app)
-
-        resp = await client.get('/permission/read')
-        assert web.HTTPUnauthorized.status_code == resp.status
-        resp = await client.get('/permission/write')
-        assert web.HTTPUnauthorized.status_code == resp.status
-        resp = await client.get('/permission/forbid')
-        assert web.HTTPUnauthorized.status_code == resp.status
-
-        await client.post('/login')
-        resp = await client.get('/permission/read')
-        assert web.HTTPOk.status_code == resp.status
-        resp = await client.get('/permission/write')
-        assert web.HTTPOk.status_code == resp.status
-        resp = await client.get('/permission/forbid')
-        assert web.HTTPForbidden.status_code == resp.status
-
-        await client.post('/logout')
-        resp = await client.get('/permission/read')
-        assert web.HTTPUnauthorized.status_code == resp.status
-        resp = await client.get('/permission/write')
-        assert web.HTTPUnauthorized.status_code == resp.status
-        resp = await client.get('/permission/forbid')
-        assert web.HTTPUnauthorized.status_code == resp.status
 
 
 async def test_check_permission(loop, aiohttp_client):

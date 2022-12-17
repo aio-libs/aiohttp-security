@@ -1,4 +1,8 @@
 import abc
+from enum import Enum
+from typing import Any, Optional, Union
+
+from aiohttp import web
 
 # see http://plope.com/pyramid_auth_design_api_postmortem
 
@@ -6,13 +10,14 @@ import abc
 class AbstractIdentityPolicy(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
-    async def identify(self, request):
+    async def identify(self, request: web.Request) -> Optional[str]:
         """Return the claimed identity of the user associated request or
         ``None`` if no identity can be found associated with the request."""
         pass
 
     @abc.abstractmethod
-    async def remember(self, request, response, identity, **kwargs):
+    async def remember(self, request: web.Request,  # type: ignore[misc]
+                       response: web.StreamResponse, identity: str, **kwargs: Any) -> None:
         """Remember identity.
 
         Modify response object by filling it's headers with remembered user.
@@ -23,7 +28,7 @@ class AbstractIdentityPolicy(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    async def forget(self, request, response):
+    async def forget(self, request: web.Request, response: web.StreamResponse) -> None:
         """ Modify response which can be used to 'forget' the
         current identity on subsequent requests."""
         pass
@@ -32,7 +37,8 @@ class AbstractIdentityPolicy(metaclass=abc.ABCMeta):
 class AbstractAuthorizationPolicy(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
-    async def permits(self, identity, permission, context=None):
+    async def permits(self, identity: Optional[str],  # type: ignore[misc]
+                      permission: Union[str, Enum], context: Any = None) -> bool:
         """Check user permissions.
 
         Return True if the identity is allowed the permission in the
@@ -41,7 +47,7 @@ class AbstractAuthorizationPolicy(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    async def authorized_userid(self, identity):
+    async def authorized_userid(self, identity: str) -> Optional[str]:
         """Retrieve authorized user id.
 
         Return the user_id of the user identified by the identity
