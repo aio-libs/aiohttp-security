@@ -1,5 +1,6 @@
 from aiohttp import web
-from aiohttp_security import remember, forget
+
+from aiohttp_security import forget, remember
 
 
 async def test_remember(loop, aiohttp_client):
@@ -13,9 +14,8 @@ async def test_remember(loop, aiohttp_client):
     client = await aiohttp_client(app)
     resp = await client.post('/')
     assert 500 == resp.status
-    assert (('Security subsystem is not initialized, '
-             'call aiohttp_security.setup(...) first') ==
-            resp.reason)
+    exp = "Security subsystem is not initialized, call aiohttp_security.setup(...) first"
+    assert exp == resp.reason
 
 
 async def test_forget(loop, aiohttp_client):
@@ -29,6 +29,5 @@ async def test_forget(loop, aiohttp_client):
     client = await aiohttp_client(app)
     resp = await client.post('/')
     assert 500 == resp.status
-    assert (('Security subsystem is not initialized, '
-             'call aiohttp_security.setup(...) first') ==
-            resp.reason)
+    exp = "Security subsystem is not initialized, call aiohttp_security.setup(...) first"
+    assert exp == resp.reason
