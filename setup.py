@@ -1,9 +1,9 @@
-from setuptools import setup, find_packages
 import os
 import re
-import subprocess
+import subprocess  # noqa: S404
 import sys
 
+from setuptools import find_packages, setup
 from setuptools.command.test import test as TestCommand
 
 
@@ -11,7 +11,7 @@ class PyTest(TestCommand):
     user_options = []
 
     def run(self):
-        errno = subprocess.call([sys.executable, '-m', 'pytest', 'tests'])
+        errno = subprocess.call([sys.executable, '-m', 'pytest', 'tests'])  # noqa: S603
         raise SystemExit(errno)
 
 
