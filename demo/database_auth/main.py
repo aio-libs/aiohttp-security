@@ -16,7 +16,7 @@ from .handlers import Web
 async def init(loop: asyncio.AbstractEventLoop) -> Tuple[asyncio.Server, web.Application,
                                                          web.Server]:
     redis_pool = await create_pool(('localhost', 6379))
-    db_engine = await create_engine(  # noqa: S106
+    db_engine = await create_engine(  # type: ignore[no-untyped-call]  # noqa: S106
         user="aiohttp_security", password="aiohttp_security",
         database="aiohttp_security", host="127.0.0.1")
     app = web.Application()
