@@ -16,8 +16,8 @@ class AbstractIdentityPolicy(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    async def remember(self, request: web.Request, response: web.StreamResponse,
-                       identity: str, **kwargs: Any) -> None:
+    async def remember(self, request: web.Request,  # type: ignore[misc]
+                       response: web.StreamResponse, identity: str, **kwargs: Any) -> None:
         """Remember identity.
 
         Modify response object by filling it's headers with remembered user.
@@ -37,8 +37,8 @@ class AbstractIdentityPolicy(metaclass=abc.ABCMeta):
 class AbstractAuthorizationPolicy(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
-    async def permits(self, identity: Optional[str], permission: Union[str, Enum],
-                      context: Any = None) -> bool:
+    async def permits(self, identity: Optional[str],  # type: ignore[misc]
+                      permission: Union[str, Enum], context: Any = None) -> bool:
         """Check user permissions.
 
         Return True if the identity is allowed the permission in the
