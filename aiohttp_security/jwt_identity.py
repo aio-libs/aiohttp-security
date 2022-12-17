@@ -20,11 +20,11 @@ AUTH_SCHEME = 'Bearer '
 
 
 class JWTIdentityPolicy(AbstractIdentityPolicy):
-    def __init__(self, secret: str, algorithm: str = "HS256"):
-        if not HAS_JWT:
+    def __init__(self, secret: str, algorithm: str = "HS256", key: str = "login"):
             raise RuntimeError('Please install `PyJWT`')
         self.secret = secret
         self.algorithm = algorithm
+        self.key = key
 
     async def identify(self, request: web.Request) -> Optional[str]:
         header_identity = request.headers.get(AUTH_HEADER_NAME)
@@ -41,7 +41,7 @@ class JWTIdentityPolicy(AbstractIdentityPolicy):
         identity = jwt.decode(token,
                               self.secret,
                               algorithms=[self.algorithm])
-        return identity
+        return identity.get(self.key)
 
     async def remember(self, request: web.Request, response: web.StreamResponse,
                        identity: str, **kwargs: None) -> None:
