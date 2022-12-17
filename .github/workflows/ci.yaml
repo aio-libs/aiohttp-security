@@ -32,9 +32,10 @@ jobs:
     - name: Install itself
       run: |
         pip install .
-    - name: Run linter
-      run: |
-        make lint
+    - name: Mypy
+      run: mypy
+    - name: Flake8
+      run: flake8
     - name: Prepare twine checker
       run: |
         pip install -U build twine
