@@ -45,6 +45,5 @@ setup(name='aiohttp-security',
       packages=find_packages(),
       install_requires=install_requires,
       tests_require=tests_require,
-      cmdclass={'test': PyTest},
       include_package_data=True,
       extras_require=extras_require)
