@@ -5,7 +5,7 @@ from aiohttp import web
 from aiohttp_session import setup as setup_session
 from aiohttp_session.redis_storage import RedisStorage
 from aiopg.sa import create_engine
-from aioredis import create_pool
+from aioredis import create_pool  # type: ignore[attr-defined]
 
 from aiohttp_security import SessionIdentityPolicy
 from aiohttp_security import setup as setup_security
@@ -39,10 +39,10 @@ async def finalize(srv: asyncio.Server, app: web.Application, handler: web.Serve
     app.loop.remove_reader(sock.fileno())
     sock.close()
 
-    await handler.finish_connections(1.0)
+    await handler.shutdown(1.0)
     srv.close()
     await srv.wait_closed()
-    await app.finish()
+    await app.cleanup()
 
 
 def main() -> None:
