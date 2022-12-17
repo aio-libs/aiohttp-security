@@ -4,6 +4,8 @@ aiohttp_session.setup() should be called on application initialization
 to configure aiohttp_session properly.
 """
 
+from typing import Optional
+
 from aiohttp import web
 try:
     from aiohttp_session import get_session
@@ -23,7 +25,7 @@ class SessionIdentityPolicy(AbstractIdentityPolicy):
             raise ImportError(
                 'SessionIdentityPolicy requires `aiohttp_session`')
 
-    async def identify(self, request: web.Request) -> str:
+    async def identify(self, request: web.Request) -> Optional[str]:
         session = await get_session(request)
         return session.get(self._session_key)
 
