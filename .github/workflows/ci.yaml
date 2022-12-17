@@ -26,7 +26,7 @@ jobs:
         cache: 'pip'
         cache-dependency-path: '**/requirements*.txt'
     - name: Install dependencies
-      uses: py-actions/py-dependency-install@v3
+      uses: py-actions/py-dependency-install@v4
       with:
         path: requirements-dev.txt
     - name: Install itself
@@ -61,7 +61,7 @@ jobs:
         cache: 'pip'
         cache-dependency-path: '**/requirements*.txt'
     - name: Install dependencies
-      uses: py-actions/py-dependency-install@v3
+      uses: py-actions/py-dependency-install@v4
       with:
         path: requirements-dev.txt
     - name: Run unittests
