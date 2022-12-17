@@ -21,6 +21,7 @@ AUTH_SCHEME = 'Bearer '
 
 class JWTIdentityPolicy(AbstractIdentityPolicy):
     def __init__(self, secret: str, algorithm: str = "HS256", key: str = "login"):
+        if not HAS_JWT:
             raise RuntimeError('Please install `PyJWT`')
         self.secret = secret
         self.algorithm = algorithm
