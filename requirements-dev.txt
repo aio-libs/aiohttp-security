@@ -6,6 +6,7 @@ flake8-bandit==4.1.1
 flake8-bugbear==22.12.6
 flake8-import-order==0.18.2
 flake8-requirements==1.7.5
+pyjwt==2.6.0
 pytest==6.2.5
 pytest-cov==3.0.0
 pytest-mock==3.6.1
@@ -19,4 +20,3 @@ hiredis==2.0.0
 passlib==1.7.4
 cryptography==36.0.1
 pytest-aiohttp==1.0.4
-pyjwt==2.6.0
