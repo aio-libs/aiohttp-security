@@ -1,8 +1,7 @@
 # Some simple testing tasks (sorry, UNIX only).
 
-flake:
-	flake8 aiohttp_security tests 
-
+lint:
+	flake8
 
 test: flake
 	pytest -s -q ./tests/
