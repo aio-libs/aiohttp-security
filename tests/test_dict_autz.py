@@ -1,12 +1,12 @@
 import enum
-import pytest
 
+import pytest
 from aiohttp import web
+
+from aiohttp_security import (
+    AbstractAuthorizationPolicy, authorized_userid, check_authorized, check_permission, forget,
+    has_permission, is_anonymous, login_required, permits, remember)
 from aiohttp_security import setup as _setup
-from aiohttp_security import (AbstractAuthorizationPolicy, authorized_userid,
-                              forget, has_permission, is_anonymous,
-                              login_required, permits, remember,
-                              check_authorized, check_permission)
 from aiohttp_security.cookies_identity import CookiesIdentityPolicy
 
 
