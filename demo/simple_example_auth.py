@@ -1,8 +1,8 @@
 from aiohttp import web
 from aiohttp_session import SimpleCookieStorage, session_middleware
 
-from aiohttp_security import (SessionIdentityPolicy, check_permission, is_anonymous,
-                              remember, forget, setup as setup_security)
+from aiohttp_security import (SessionIdentityPolicy, check_permission, forget,
+                              is_anonymous, remember, setup as setup_security)
 from aiohttp_security.abc import AbstractAuthorizationPolicy
 
 
