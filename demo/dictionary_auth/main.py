@@ -1,14 +1,15 @@
 import base64
-from cryptography import fernet
+
 from aiohttp import web
 from aiohttp_session import setup as setup_session
 from aiohttp_session.cookie_storage import EncryptedCookieStorage
-from aiohttp_security import setup as setup_security
-from aiohttp_security import SessionIdentityPolicy
+from cryptography import fernet
 
-from demo.dictionary_auth.authz import DictionaryAuthorizationPolicy
-from demo.dictionary_auth.handlers import configure_handlers
-from demo.dictionary_auth.users import user_map
+from aiohttp_security import SessionIdentityPolicy
+from aiohttp_security import setup as setup_security
+from .authz import DictionaryAuthorizationPolicy
+from .handlers import configure_handlers
+from .users import user_map
 
 
 def make_app():
