@@ -10,7 +10,7 @@ mypy==0.991
 pytest==6.2.5
 pytest-cov==3.0.0
 pytest-mock==3.6.1
-coverage==6.2
+coverage==6.5.0
 sphinx==4.3.2
 sqlalchemy==1.4.45
 sqlalchemy-stubs==0.4
