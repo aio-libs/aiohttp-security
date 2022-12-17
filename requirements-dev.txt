@@ -19,4 +19,4 @@ hiredis==2.0.0
 passlib==1.7.4
 cryptography==36.0.1
 pytest-aiohttp==1.0.4
-pyjwt==2.3.0
+pyjwt==2.6.0
