@@ -1,5 +1,5 @@
-from sphinx.domains.python import PyModulelevel, PyClassmember
 from sphinx import addnodes
+from sphinx.domains.python import PyClassmember, PyModulelevel
 
 
 class PyCoroutineMixin(object):
