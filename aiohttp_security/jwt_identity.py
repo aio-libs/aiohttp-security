@@ -33,8 +33,8 @@ class JWTIdentityPolicy(AbstractIdentityPolicy):
             return None
 
         if not header_identity.startswith(AUTH_SCHEME):
-            raise ValueError('Invalid authorization scheme. ' +
-                             'Should be `{}<token>`'.format(AUTH_SCHEME))
+            raise ValueError("Invalid authorization scheme. "
+                             + "Should be `{}<token>`".format(AUTH_SCHEME))
 
         token = header_identity.split(' ')[1].strip()
 

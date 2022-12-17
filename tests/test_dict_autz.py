@@ -1,12 +1,12 @@
 import enum
-import pytest
 
+import pytest
 from aiohttp import web
+
+from aiohttp_security import (
+    AbstractAuthorizationPolicy, authorized_userid, check_authorized, check_permission, forget,
+    has_permission, is_anonymous, login_required, permits, remember)
 from aiohttp_security import setup as _setup
-from aiohttp_security import (AbstractAuthorizationPolicy, authorized_userid,
-                              forget, has_permission, is_anonymous,
-                              login_required, permits, remember,
-                              check_authorized, check_permission)
 from aiohttp_security.cookies_identity import CookiesIdentityPolicy
 
 
@@ -164,39 +164,37 @@ async def test_is_anonymous(loop, aiohttp_client):
 
 
 async def test_login_required(loop, aiohttp_client):
-    with pytest.raises(DeprecationWarning):
+    @login_required
+    async def index(request):
+        return web.Response()
 
-        @login_required
-        async def index(request):
-            return web.Response()
+    async def login(request):
+        response = web.HTTPFound(location="/")
+        await remember(request, response, "UserID")
+        raise response
 
-        async def login(request):
-            response = web.HTTPFound(location='/')
-            await remember(request, response, 'UserID')
-            raise response
+    async def logout(request):
+        response = web.HTTPFound(location="/")
+        await forget(request, response)
+        raise response
 
-        async def logout(request):
-            response = web.HTTPFound(location='/')
-            await forget(request, response)
-            raise response
+    app = web.Application()
+    _setup(app, CookiesIdentityPolicy(), Autz())
+    app.router.add_route("GET", "/", index)
+    app.router.add_route("POST", "/login", login)
+    app.router.add_route("POST", "/logout", logout)
 
-        app = web.Application()
-        _setup(app, CookiesIdentityPolicy(), Autz())
-        app.router.add_route('GET', '/', index)
-        app.router.add_route('POST', '/login', login)
-        app.router.add_route('POST', '/logout', logout)
+    client = await aiohttp_client(app)
+    resp = await client.get("/")
+    assert web.HTTPUnauthorized.status_code == resp.status
 
-        client = await aiohttp_client(app)
-        resp = await client.get('/')
-        assert web.HTTPUnauthorized.status_code == resp.status
+    await client.post("/login")
+    resp = await client.get("/")
+    assert web.HTTPOk.status_code == resp.status
 
-        await client.post('/login')
-        resp = await client.get('/')
-        assert web.HTTPOk.status_code == resp.status
-
-        await client.post('/logout')
-        resp = await client.get('/')
-        assert web.HTTPUnauthorized.status_code == resp.status
+    await client.post("/logout")
+    resp = await client.get("/")
+    assert web.HTTPUnauthorized.status_code == resp.status
 
 
 async def test_check_authorized(loop, aiohttp_client):

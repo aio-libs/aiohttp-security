@@ -2,8 +2,8 @@ import jwt
 import pytest
 from aiohttp import web
 
-from aiohttp_security import setup as _setup
 from aiohttp_security import AbstractAuthorizationPolicy
+from aiohttp_security import setup as _setup
 from aiohttp_security.api import IDENTITY_KEY
 from aiohttp_security.jwt_identity import JWTIdentityPolicy
 
@@ -36,7 +36,7 @@ async def test_no_pyjwt_installed(mocker):
 
 
 async def test_identify(loop, make_token, aiohttp_client):
-    kwt_secret_key = 'Key'
+    kwt_secret_key = "Key"  # noqa: S105
 
     token = make_token({'login': 'Andrew'}, kwt_secret_key)
 
@@ -51,13 +51,13 @@ async def test_identify(loop, make_token, aiohttp_client):
     app.router.add_route('GET', '/', check)
 
     client = await aiohttp_client(app)
-    headers = {'Authorization': 'Bearer {}'.format(token.decode('utf-8'))}
+    headers = {"Authorization": "Bearer {}".format(token)}
     resp = await client.get('/', headers=headers)
     assert 200 == resp.status
 
 
 async def test_identify_broken_scheme(loop, make_token, aiohttp_client):
-    kwt_secret_key = 'Key'
+    kwt_secret_key = "Key"  # noqa: S105
 
     token = make_token({'login': 'Andrew'}, kwt_secret_key)
 
@@ -76,7 +76,7 @@ async def test_identify_broken_scheme(loop, make_token, aiohttp_client):
     app.router.add_route('GET', '/', check)
 
     client = await aiohttp_client(app)
-    headers = {'Authorization': 'Token {}'.format(token.decode('utf-8'))}
+    headers = {"Authorization": "Token {}".format(token)}
     resp = await client.get('/', headers=headers)
     assert 400 == resp.status
     assert 'Invalid authorization scheme' in resp.reason

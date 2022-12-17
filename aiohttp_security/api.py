@@ -6,6 +6,10 @@ from typing import Any, Callable, Optional, TypeVar, Union
 from aiohttp import web
 from aiohttp_security.abc import AbstractAuthorizationPolicy, AbstractIdentityPolicy
 
+from aiohttp import web
+
+from aiohttp_security.abc import AbstractAuthorizationPolicy, AbstractIdentityPolicy
+
 IDENTITY_KEY = 'aiohttp_security_identity_policy'
 AUTZ_KEY = 'aiohttp_security_autz_policy'
 
@@ -25,8 +29,8 @@ async def remember(request: web.Request, response: web.StreamResponse,
     Usually the identity is stored in user cookies somehow but may be
     pushed into custom header also.
     """
-    assert isinstance(identity, str), identity
-    assert identity
+    if not identity or not isinstance(identity, str):
+        raise ValueError("Identity should be a str value.")
     identity_policy = request.config_dict.get(IDENTITY_KEY)
     if identity_policy is None:
         text = ("Security subsystem is not initialized, "
@@ -69,8 +73,8 @@ async def authorized_userid(request: web.Request) -> Optional[str]:
 
 async def permits(request: web.Request, permission: Union[str, enum.Enum],
                   context: Any = None) -> bool:
-    assert isinstance(permission, (str, enum.Enum)), permission
-    assert permission
+    if not permission or not isinstance(permission, (str, enum.Enum)):
+        raise ValueError("Permission should be a str or enum value.")
     identity_policy: _AIP = request.config_dict.get(IDENTITY_KEY)
     autz_policy: _AAP = request.config_dict.get(AUTZ_KEY)
     if identity_policy is None or autz_policy is None:
@@ -175,8 +179,10 @@ def has_permission(permission: Union[str, enum.Enum], context: Any = None):  # t
 
 def setup(app: web.Application, identity_policy: AbstractIdentityPolicy,
           autz_policy: AbstractAuthorizationPolicy) -> None:
-    assert isinstance(identity_policy, AbstractIdentityPolicy), identity_policy
-    assert isinstance(autz_policy, AbstractAuthorizationPolicy), autz_policy
+    if not isinstance(identity_policy, AbstractIdentityPolicy):
+        raise ValueError("Identity policy is not subclass of AbstractIdentityPolicy")
+    if not isinstance(autz_policy, AbstractAuthorizationPolicy):
+        raise ValueError("Authentication policy is not subclass of AbstractAuthorizationPolicy")
 
     app[IDENTITY_KEY] = identity_policy
     app[AUTZ_KEY] = autz_policy

@@ -1,13 +1,12 @@
 import pytest
-
 from aiohttp import web
-from aiohttp_security import (remember, forget,
-                              AbstractAuthorizationPolicy)
-from aiohttp_security import setup as setup_security
-from aiohttp_security.session_identity import SessionIdentityPolicy
-from aiohttp_security.api import IDENTITY_KEY
 from aiohttp_session import SimpleCookieStorage, get_session
 from aiohttp_session import setup as setup_session
+
+from aiohttp_security import AbstractAuthorizationPolicy, forget, remember
+from aiohttp_security import setup as setup_security
+from aiohttp_security.api import IDENTITY_KEY
+from aiohttp_security.session_identity import SessionIdentityPolicy
 
 
 class Autz(AbstractAuthorizationPolicy):
