@@ -16,7 +16,7 @@ AUTZ_KEY = 'aiohttp_security_autz_policy'
 # _AIP/_AAP are shorthand for Optional[policy] when we retrieve from request.
 _AAP = Optional[AbstractAuthorizationPolicy]
 _AIP = Optional[AbstractIdentityPolicy]
-_Handler = TypeVar('_Handler', bound=Union[Callable[[web.Request], Any],
+_Handler = TypeVar("_Handler", bound=Union[Callable[[web.Request], Any],
                                            Callable[[object, web.Request], Any]])
 
 

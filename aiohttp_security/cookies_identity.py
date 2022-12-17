@@ -10,7 +10,7 @@ from typing import Any, NewType, Optional, Union, cast
 
 from .abc import AbstractIdentityPolicy
 
-_Sentinel = NewType('_Sentinel', object)
+_Sentinel = NewType("_Sentinel", object)
 sentinel = _Sentinel(object())
 
 

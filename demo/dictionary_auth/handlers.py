@@ -40,8 +40,8 @@ async def index(request: web.Request) -> web.Response:
 
 
 async def login(request: web.Request) -> NoReturn:
-    user_map: Dict[str, User] = request.app['user_map']
-    invalid_response = web.HTTPUnauthorized(body='Invalid username / password combination')
+    user_map: Dict[str, User] = request.app["user_map"]
+    invalid_response = web.HTTPUnauthorized(body="Invalid username / password combination")
     form = await request.post()
     username = form.get('username')
     password = form.get('password')
@@ -51,7 +51,7 @@ async def login(request: web.Request) -> NoReturn:
 
     verified = await check_credentials(user_map, username, password)
     if verified:
-        response = web.HTTPFound('/')
+        response = web.HTTPFound("/")
         await remember(request, response, username)
         raise response
 

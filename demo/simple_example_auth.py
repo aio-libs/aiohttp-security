@@ -19,7 +19,7 @@ class SimpleJack_AuthorizationPolicy(AbstractAuthorizationPolicy):
         Return the user_id of the user identified by the identity
         or 'None' if no user exists related to the identity.
         """
-        return identity if identity == 'jack' else None
+        return identity if identity == "jack" else None
 
     async def permits(self, identity: str, permission: Union[str, Enum],
                       context: None = None) -> bool:

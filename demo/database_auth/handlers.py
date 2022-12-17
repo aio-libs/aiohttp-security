@@ -36,17 +36,17 @@ class Web(object):
         return response
 
     async def login(self, request: web.Request) -> NoReturn:
-        invalid_resp = web.HTTPUnauthorized(body=b'Invalid username/password combination')
+        invalid_resp = web.HTTPUnauthorized(body=b"Invalid username/password combination")
         form = await request.post()
         login = form.get('login')
         password = form.get('password')
-        db_engine = request.app['db_engine']
+        db_engine = request.app["db_engine"]
 
         if not (isinstance(login, str) and isinstance(password, str)):
             raise invalid_resp
 
         if await check_credentials(db_engine, login, password):
-            response = web.HTTPFound('/')
+            response = web.HTTPFound("/")
             await remember(request, response, login)
             raise response
 

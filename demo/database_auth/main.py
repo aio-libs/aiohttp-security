@@ -1,5 +1,5 @@
 import asyncio
-from typing import Any, Tuple
+from typing import Tuple
 
 from aiohttp import web
 from aiohttp_session import setup as setup_session
@@ -13,13 +13,13 @@ from .db_auth import DBAuthorizationPolicy
 from .handlers import Web
 
 
-async def init(loop: asyncio.AbstractEventLoop) -> Tuple[Any, ...]:
+async def init(loop: asyncio.AbstractEventLoop) -> Tuple[asyncio.Server, web.Application, web.Server]:
     redis_pool = await create_pool(('localhost', 6379))
     db_engine = await create_engine(  # noqa: S106
         user="aiohttp_security", password="aiohttp_security",
         database="aiohttp_security", host="127.0.0.1")
     app = web.Application()
-    app['db_engine'] = db_engine
+    app["db_engine"] = db_engine
     setup_session(app, RedisStorage(redis_pool))
     setup_security(app,
                    SessionIdentityPolicy(),
@@ -34,7 +34,7 @@ async def init(loop: asyncio.AbstractEventLoop) -> Tuple[Any, ...]:
     return srv, app, handler
 
 
-async def finalize(srv: Any, app: Any, handler: Any) -> None:
+async def finalize(srv: asyncio.Server, app: web.Application, handler: web.Server) -> None:
     sock = srv.sockets[0]
     app.loop.remove_reader(sock.fileno())
     sock.close()
