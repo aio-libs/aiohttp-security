@@ -37,7 +37,7 @@ jobs:
         make lint
     - name: Prepare twine checker
       run: |
-        pip install -U build twine wheel
+        pip install -U build twine
         python -m build
     - name: Run twine checker
       run: |
