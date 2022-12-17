@@ -1,7 +1,5 @@
 import os
 import re
-import subprocess  # noqa: S404
-import sys
 
 from setuptools import find_packages, setup
 
