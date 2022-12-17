@@ -169,31 +169,31 @@ async def test_login_required(loop, aiohttp_client):
         return web.Response()
 
     async def login(request):
-        response = web.HTTPFound(location='/')
-        await remember(request, response, 'UserID')
+        response = web.HTTPFound(location="/")
+        await remember(request, response, "UserID")
         raise response
 
     async def logout(request):
-        response = web.HTTPFound(location='/')
+        response = web.HTTPFound(location="/")
         await forget(request, response)
         raise response
 
     app = web.Application()
     _setup(app, CookiesIdentityPolicy(), Autz())
-    app.router.add_route('GET', '/', index)
-    app.router.add_route('POST', '/login', login)
-    app.router.add_route('POST', '/logout', logout)
+    app.router.add_route("GET", "/", index)
+    app.router.add_route("POST", "/login", login)
+    app.router.add_route("POST", "/logout", logout)
 
     client = await aiohttp_client(app)
-    resp = await client.get('/')
+    resp = await client.get("/")
     assert web.HTTPUnauthorized.status_code == resp.status
 
-    await client.post('/login')
-    resp = await client.get('/')
+    await client.post("/login")
+    resp = await client.get("/")
     assert web.HTTPOk.status_code == resp.status
 
-    await client.post('/logout')
-    resp = await client.get('/')
+    await client.post("/logout")
+    resp = await client.get("/")
     assert web.HTTPUnauthorized.status_code == resp.status
 
 
