@@ -1,17 +1,16 @@
 # Some simple testing tasks (sorry, UNIX only).
 
-flake:
-	flake8 aiohttp_security tests 
-
+lint:
+	flake8
 
 test: flake
-	py.test -s -q ./tests/
+	pytest -s -q ./tests/
 
 vtest: flake
-	py.test -s ./tests/
+	pytest -s ./tests/
 
 cov cover coverage: flake
-	py.test -s ./tests/ --cov=aiohttp_security --cov=tests --cov-report=html --cov-report=term
+	pytest -s ./tests/ --cov-report=term
 	@echo "open file://`pwd`/coverage/index.html"
 
 clean:

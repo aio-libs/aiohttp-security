@@ -1,9 +1,10 @@
 import enum
 import warnings
-from aiohttp import web
-from aiohttp_security.abc import (AbstractIdentityPolicy,
-                                  AbstractAuthorizationPolicy)
 from functools import wraps
+
+from aiohttp import web
+
+from aiohttp_security.abc import AbstractAuthorizationPolicy, AbstractIdentityPolicy
 
 IDENTITY_KEY = 'aiohttp_security_identity_policy'
 AUTZ_KEY = 'aiohttp_security_autz_policy'
@@ -17,8 +18,8 @@ async def remember(request, response, identity, **kwargs):
     Usually the identity is stored in user cookies somehow but may be
     pushed into custom header also.
     """
-    assert isinstance(identity, str), identity
-    assert identity
+    if not identity or not isinstance(identity, str):
+        raise ValueError("Identity should be a str value.")
     identity_policy = request.config_dict.get(IDENTITY_KEY)
     if identity_policy is None:
         text = ("Security subsystem is not initialized, "
@@ -60,8 +61,8 @@ async def authorized_userid(request):
 
 
 async def permits(request, permission, context=None):
-    assert isinstance(permission, (str, enum.Enum)), permission
-    assert permission
+    if not permission or not isinstance(permission, (str, enum.Enum)):
+        raise ValueError("Permission should be a str or enum value.")
     identity_policy = request.config_dict.get(IDENTITY_KEY)
     autz_policy = request.config_dict.get(AUTZ_KEY)
     if identity_policy is None or autz_policy is None:
@@ -167,8 +168,10 @@ def has_permission(
 
 
 def setup(app, identity_policy, autz_policy):
-    assert isinstance(identity_policy, AbstractIdentityPolicy), identity_policy
-    assert isinstance(autz_policy, AbstractAuthorizationPolicy), autz_policy
+    if not isinstance(identity_policy, AbstractIdentityPolicy):
+        raise ValueError("Identity policy is not subclass of AbstractIdentityPolicy")
+    if not isinstance(autz_policy, AbstractAuthorizationPolicy):
+        raise ValueError("Authentication policy is not subclass of AbstractAuthorizationPolicy")
 
     app[IDENTITY_KEY] = identity_policy
     app[AUTZ_KEY] = autz_policy

@@ -1,0 +1,119 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - '[0-9].[0-9]+'
+    tags: [ 'v*' ]
+  pull_request:
+    branches:
+      - master
+      - '[0-9].[0-9]+'
+
+jobs:
+  lint:
+    name: Linter
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+        cache: 'pip'
+        cache-dependency-path: '**/requirements*.txt'
+    - name: Install dependencies
+      uses: py-actions/py-dependency-install@v3
+      with:
+        path: requirements-dev.txt
+    - name: Install itself
+      run: |
+        pip install .
+    - name: Run linter
+      run: |
+        make lint
+    - name: Prepare twine checker
+      run: |
+        pip install -U build twine wheel
+        python -m build
+    - name: Run twine checker
+      run: |
+        twine check dist/*
+
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        pyver: ['3.7', '3.8', '3.9', '3.10']
+        include:
+          - pyver: pypy-3.8
+    timeout-minutes: 15
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.pyver }}
+        cache: 'pip'
+        cache-dependency-path: '**/requirements*.txt'
+    - name: Install dependencies
+      uses: py-actions/py-dependency-install@v3
+      with:
+        path: requirements-dev.txt
+    - name: Run unittests
+      env:
+        COLOR: 'yes'
+      run: |
+        pytest tests --cov-report xml
+        python -m coverage xml
+    - name: Upload coverage
+      uses: codecov/codecov-action@v1
+      with:
+        file: ./coverage.xml
+        flags: unit
+        fail_ci_if_error: false
+
+  check:  # This job does nothing and is only used for the branch protection
+    if: always()
+
+    needs: [lint, test]
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Decide whether the needed jobs succeeded or failed
+      uses: re-actors/alls-green@release/v1
+      with:
+        jobs: ${{ toJSON(needs) }}
+
+  deploy:
+    name: Deploy
+    environment: release
+    if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+    needs: [check]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Update pip, wheel, setuptools, build, twine
+      run: |
+        python -m pip install -U pip wheel setuptools build twine
+    - name: Build dists
+      run: |
+        python -m build
+    - name: Make Release
+      uses: aio-libs/create-release@v1
+      with:
+        changes_file: CHANGES.txt
+        name: aiohttp-security
+        version_file: aiohttp_security/__init__.py
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        pypi_token: ${{ secrets.PYPI_API_TOKEN }}
+        dist_dir: dist
+        fix_issue_regex: "`#(\\d+) <https://github.com/aio-libs/aiohttp-security/issues/\\1>`"
+        fix_issue_repl: "(#\\1)"

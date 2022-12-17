@@ -1,8 +1,8 @@
 from aiohttp import web
 from aiohttp_session import SimpleCookieStorage, session_middleware
-from aiohttp_security import check_permission, \
-    is_anonymous, remember, forget, \
-    setup as setup_security, SessionIdentityPolicy
+
+from aiohttp_security import (SessionIdentityPolicy, check_permission, forget,
+                              is_anonymous, remember, setup as setup_security)
 from aiohttp_security.abc import AbstractAuthorizationPolicy
 
 
@@ -28,18 +28,16 @@ class SimpleJack_AuthorizationPolicy(AbstractAuthorizationPolicy):
 
 
 async def handler_root(request):
+    tmpl = """<html><head></head><body>
+        Hello, I'm Jack, I'm {} logged in.<br /><br />
+        <a href="/login">Log me in</a><br />
+        <a href="/logout">Log me out</a><br /><br />
+        Check my permissions, when I'm logged in and logged out.<br />
+        <a href="/listen">Can I listen?</a><br />
+        <a href="/speak">Can I speak?</a><br />
+    </body></html>"""
     is_logged = not await is_anonymous(request)
-    return web.Response(text='''<html><head></head><body>
-            Hello, I'm Jack, I'm {logged} logged in.<br /><br />
-            <a href="/login">Log me in</a><br />
-            <a href="/logout">Log me out</a><br /><br />
-            Check my permissions,
-            when i'm logged in and logged out.<br />
-            <a href="/listen">Can I listen?</a><br />
-            <a href="/speak">Can I speak?</a><br />
-        </body></html>'''.format(
-            logged='' if is_logged else 'NOT',
-        ), content_type='text/html')
+    return web.Response(text=tmpl.format("" if is_logged else "NOT"), content_type="text/html")
 
 
 async def handler_login_jack(request):

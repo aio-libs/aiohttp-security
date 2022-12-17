@@ -1,9 +1,9 @@
 from aiohttp import web
-from aiohttp_security import (remember, forget,
-                              AbstractAuthorizationPolicy)
+
+from aiohttp_security import AbstractAuthorizationPolicy, forget, remember
 from aiohttp_security import setup as _setup
-from aiohttp_security.cookies_identity import CookiesIdentityPolicy
 from aiohttp_security.api import IDENTITY_KEY
+from aiohttp_security.cookies_identity import CookiesIdentityPolicy
 
 
 class Autz(AbstractAuthorizationPolicy):
