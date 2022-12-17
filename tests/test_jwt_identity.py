@@ -76,7 +76,7 @@ async def test_identify_broken_scheme(loop, make_token, aiohttp_client):
     app.router.add_route('GET', '/', check)
 
     client = await aiohttp_client(app)
-    headers = {'Authorization': 'Token {}'.format(token.decode('utf-8'))}
+    headers = {"Authorization": "Token {}".format(token)}
     resp = await client.get('/', headers=headers)
     assert 400 == resp.status
     assert 'Invalid authorization scheme' in resp.reason
