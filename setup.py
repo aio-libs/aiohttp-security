@@ -7,14 +7,6 @@ from setuptools import find_packages, setup
 from setuptools.command.test import test as TestCommand
 
 
-class PyTest(TestCommand):
-    user_options = []
-
-    def run(self):
-        errno = subprocess.call([sys.executable, '-m', 'pytest', 'tests'])  # noqa: S603
-        raise SystemExit(errno)
-
-
 with open(os.path.join(os.path.abspath(os.path.dirname(
         __file__)), 'aiohttp_security', '__init__.py'), 'r', encoding='latin1') as fp:
     try:
