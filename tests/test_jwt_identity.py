@@ -30,7 +30,7 @@ class Autz(AbstractAuthorizationPolicy):
 
 
 async def test_no_pyjwt_installed(mocker):
-    mocker.patch('aiohttp_security.jwt_identity.jwt', None)
+    mocker.patch("aiohttp_security.jwt_identity.HAS_JWT", False)
     with pytest.raises(RuntimeError):
         JWTIdentityPolicy('secret')
 
