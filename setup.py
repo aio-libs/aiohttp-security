@@ -1,18 +1,7 @@
 import os
 import re
-import subprocess  # noqa: S404
-import sys
 
 from setuptools import find_packages, setup
-from setuptools.command.test import test as TestCommand
-
-
-class PyTest(TestCommand):
-    user_options = []
-
-    def run(self):
-        errno = subprocess.call([sys.executable, '-m', 'pytest', 'tests'])  # noqa: S603
-        raise SystemExit(errno)
 
 
 with open(os.path.join(os.path.abspath(os.path.dirname(
@@ -36,6 +25,7 @@ setup(name='aiohttp-security',
       version=version,
       description=("security for aiohttp.web"),
       long_description='\n\n'.join((read('README.rst'), read('CHANGES.txt'))),
+      long_description_content_type="text/x-rst",
       classifiers=[
           'License :: OSI Approved :: Apache Software License',
           'Intended Audience :: Developers',
@@ -54,6 +44,5 @@ setup(name='aiohttp-security',
       packages=find_packages(),
       install_requires=install_requires,
       tests_require=tests_require,
-      cmdclass={'test': PyTest},
       include_package_data=True,
       extras_require=extras_require)
