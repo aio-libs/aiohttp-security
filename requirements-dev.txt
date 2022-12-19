@@ -21,6 +21,6 @@ sqlalchemy-stubs==0.4
 types-passlib==1.7.7.3
 pep257==0.7.0
 aioredis==2.0.1
-hiredis==2.0.0
+hiredis==2.1.0
 passlib==1.7.4
 pytest-aiohttp==1.0.4
