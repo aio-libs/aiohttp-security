@@ -9,4 +9,4 @@ mypy==0.991
 sqlalchemy-stubs==0.4
 types-passlib==1.7.7.3
 pep257==0.7.0
-sphinx==6.1.2
+sphinx==6.1.3
