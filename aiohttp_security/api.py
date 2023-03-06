@@ -114,7 +114,7 @@ async def check_permission(request: web.Request, permission: Union[str, enum.Enu
     await check_authorized(request)
     allowed = await permits(request, permission, context)
     if not allowed:
-        raise web.HTTPForbidden()
+        raise web.HTTPForbidden(reason="User does not have '{}' permission".format(permission))
 
 
 def setup(app: web.Application, identity_policy: AbstractIdentityPolicy,
