@@ -24,7 +24,7 @@ extras_require = {'session': 'aiohttp-session'}
 setup(name='aiohttp-security',
       version=version,
       description=("security for aiohttp.web"),
-      long_description='\n\n'.join((read('README.rst'), read('CHANGES.txt'))),
+      long_description='\n\n'.join((read("README.rst"), read("CHANGES.rst"))),
       long_description_content_type="text/x-rst",
       classifiers=[
           'License :: OSI Approved :: Apache Software License',
