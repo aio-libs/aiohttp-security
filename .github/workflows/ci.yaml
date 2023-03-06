@@ -108,7 +108,7 @@ jobs:
     - name: Make Release
       uses: aio-libs/create-release@v1
       with:
-        changes_file: CHANGES.txt
+        changes_file: CHANGES.rst
         name: aiohttp-security
         version_file: aiohttp_security/__init__.py
         github_token: ${{ secrets.GITHUB_TOKEN }}
