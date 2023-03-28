@@ -7,6 +7,6 @@ flake8-import-order==0.18.2
 flake8-requirements==1.7.7
 mypy==1.1.1
 sqlalchemy-stubs==0.4
-types-passlib==1.7.7.10
+types-passlib==1.7.7.11
 pep257==0.7.0
 sphinx==6.1.3
