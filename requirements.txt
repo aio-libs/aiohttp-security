@@ -6,7 +6,7 @@ aioredis==2.0.1
 async-timeout==4.0.2
 coverage==7.2.4
 cryptography==40.0.2
-hiredis==2.2.2
+hiredis==2.2.3
 passlib==1.7.4
 pyjwt==2.6.0
 pytest==7.3.1
