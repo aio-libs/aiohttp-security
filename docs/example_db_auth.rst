@@ -23,7 +23,7 @@ Database
 When the application runs, we initialise the DB with sample data using SQLAlchemy
 ORM:
 
-.. literalinclude:: demo/database_auth/main.py
+.. literalinclude:: ../demo/database_auth/main.py
    :pyobject: init_db
 
 
@@ -31,12 +31,12 @@ This will consist of 2 tables/models created in ``db.py``:
 
 Users:
 
-.. literalinclude:: demo/database_auth/db.py
+.. literalinclude:: ../demo/database_auth/db.py
    :pyobject: User
 
 And their permissions:
 
-.. literalinclude:: demo/database_auth/db.py
+.. literalinclude:: ../demo/database_auth/db.py
    :pyobject: Permission
 
 
@@ -59,7 +59,7 @@ database-based authorization policy.
 In our example we will lookup a user login in the database and, if present, return
 the identity.
 
-.. literalinclude:: demo/database_auth/db_auth.py
+.. literalinclude:: ../demo/database_auth/db_auth.py
    :pyobject: DBAuthorizationPolicy.authorized_userid
 
 
@@ -67,7 +67,7 @@ For permission checking, we will fetch the user first, check if he is superuser
 (all permissions are allowed), otherwise check if the permission is explicitly set
 for that user.
 
-.. literalinclude:: demo/database_auth/db_auth.py
+.. literalinclude:: ../demo/database_auth/db_auth.py
    :pyobject: DBAuthorizationPolicy.permits
 
 
@@ -76,7 +76,7 @@ Setup
 
 Once we have all the code in place we can install it for our application:
 
-.. literalinclude:: demo/database_auth/main.py
+.. literalinclude:: ../demo/database_auth/main.py
    :pyobject: init_app
 
 Now we have authorization and can decorate every other view with access rights
@@ -86,12 +86,12 @@ based on permissions. There are two helpers included for this::
 
 For each view you need to protect - just apply the decorator on it.
 
-.. literalinclude:: demo/database_auth/handlers.py
+.. literalinclude:: ../demo/database_auth/handlers.py
    :pyobject: Web.protected_page
 
 or
 
-.. literalinclude:: demo/database_auth/handlers.py
+.. literalinclude:: ../demo/database_auth/handlers.py
    :pyobject: Web.logout
 
 If someone tries to access that protected page he will see::
@@ -110,7 +110,7 @@ function may do what you are trying to accomplish::
 
     from passlib.hash import sha256_crypt
 
-.. literalinclude:: demo/database_auth/db_auth.py
+.. literalinclude:: ../demo/database_auth/db_auth.py
    :pyobject: check_credentials
 
 
