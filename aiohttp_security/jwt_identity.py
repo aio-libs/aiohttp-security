@@ -42,7 +42,7 @@ class JWTIdentityPolicy(AbstractIdentityPolicy):
         identity = jwt.decode(token,
                               self.secret,
                               algorithms=[self.algorithm])
-        return identity.get(self.key)
+        return identity.get(self.key)  # type: ignore[no-any-return]
 
     async def remember(self, request: web.Request, response: web.StreamResponse,
                        identity: str, **kwargs: None) -> None:
