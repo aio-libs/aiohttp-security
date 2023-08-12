@@ -1,5 +1,3 @@
-import asyncio
-
 from aiohttp import web
 from aiohttp_session import SimpleCookieStorage, setup as setup_session
 from sqlalchemy.ext.asyncio import (AsyncEngine, AsyncSession, async_sessionmaker,
@@ -7,7 +5,7 @@ from sqlalchemy.ext.asyncio import (AsyncEngine, AsyncSession, async_sessionmake
 
 from aiohttp_security import SessionIdentityPolicy
 from aiohttp_security import setup as setup_security
-from .db import Base, User, Permission
+from .db import Base, Permission, User
 from .db_auth import DBAuthorizationPolicy
 from .handlers import Web
 
