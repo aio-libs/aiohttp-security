@@ -1,10 +1,13 @@
 .. _aiohttp-security-example-db-auth:
 
-===========================================
-Permissions with PostgreSQL-based storage
-===========================================
+=======================================
+Permissions with database-based storage
+=======================================
 
-Make sure that you have PostgreSQL and Redis servers up and running.
+We use :class:`~aiohttp_session.SimpleCookieStorage` and an in-memory SQLite DB to
+make it easy to try out the demo. When developing an application, you should use
+:class:`~aiohttp_session.cookie_storage.EncryptedCookieStorage` or
+:class:`~aiohttp_session.redis_storage.RedisStorage` and a production-ready database.
 If you want the full source code in advance or for comparison, check out
 the `demo source`_.
 
@@ -17,185 +20,103 @@ the `demo source`_.
 Database
 --------
 
-Launch these sql scripts to init database and fill it with sample data:
+When the application runs, we initialise the DB with sample data using SQLAlchemy
+ORM:
 
-``psql template1 < demo/sql/init_db.sql``
-
-and
-
-``psql template1 < demo/sql/sample_data.sql``
+.. literalinclude:: demo/database_auth/main.py
+   :pyobject: init_db
 
 
-Now you have two tables:
+This will consist of 2 tables/models created in ``db.py``:
 
-- for storing users
+Users:
 
-+--------------+
-| users        |
-+==============+
-| id           |
-+--------------+
-| login        |
-+--------------+
-| passwd       |
-+--------------+
-| is_superuser |
-+--------------+
-| disabled     |
-+--------------+
+.. literalinclude:: demo/database_auth/db.py
+   :pyobject: User
 
-- for storing their permissions
+And their permissions:
 
-+-----------------+
-| permissions     |
-+=================+
-| id              |
-+-----------------+
-| user_id         |
-+-----------------+
-| perm_name       |
-+-----------------+
+.. literalinclude:: demo/database_auth/db.py
+   :pyobject: Permission
 
 
 Writing policies
 ----------------
 
-You need to implement two entities: *IdentityPolicy* and *AuthorizationPolicy*.
-First one should have these methods: *identify*, *remember* and *forget*.
-For second one: *authorized_userid* and *permits*. We will use built-in
-*SessionIdentityPolicy* and write our own database-based authorization policy.
+You need to implement two entities:
+:class:`IdentityPolicy<aiohttp_security.AbstractIdentityPolicy>` and
+:class:`AuthorizationPolicy<aiohttp_security.AbstractAuthorizationPolicy>`.
+First one should have these methods:
+:class:`~aiohttp_security.AbstractIdentityPolicy.identify`,
+:class:`~aiohttp_security.AbstractIdentityPolicy.remember` and
+:class:`~aiohttp_security.AbstractIdentityPolicy.forget`.
+For the second one:
+:class:`~aiohttp_security.AbstractAuthorizationPolicy.authorized_userid` and
+:class:`~aiohttp_security.AbstractAuthorizationPolicy.permits`. We will use the
+included :class:`~aiohttp_security.SessionIdentityPolicy` and write our own
+database-based authorization policy.
 
-In our example we will lookup database by user login and if presents then return
-this identity::
+In our example we will lookup a user login in the database and, if present, return
+the identity.
+
+.. literalinclude:: demo/database_auth/db_auth.py
+   :pyobject: DBAuthorizationPolicy.authorized_userid
 
 
-    async def authorized_userid(self, identity):
-        async with self.dbengine as conn:
-            where = sa.and_(db.users.c.login == identity,
-                            sa.not_(db.users.c.disabled))
-            query = db.users.count().where(where)
-            ret = await conn.scalar(query)
-            if ret:
-                return identity
-            else:
-                return None
+For permission checking, we will fetch the user first, check if he is superuser
+(all permissions are allowed), otherwise check if the permission is explicitly set
+for that user.
 
-
-For permission checking we will fetch the user first, check if he is superuser
-(all permissions are allowed), otherwise check if permission is explicitly set
-for that user::
-
-    async def permits(self, identity, permission, context=None):
-        if identity is None:
-            return False
-
-        async with self.dbengine as conn:
-            where = sa.and_(db.users.c.login == identity,
-                            sa.not_(db.users.c.disabled))
-            query = db.users.select().where(where)
-            ret = await conn.execute(query)
-            user = await ret.fetchone()
-            if user is not None:
-                user_id = user[0]
-                is_superuser = user[3]
-                if is_superuser:
-                    return True
-
-                where = db.permissions.c.user_id == user_id
-                query = db.permissions.select().where(where)
-                ret = await conn.execute(query)
-                result = await ret.fetchall()
-                if ret is not None:
-                    for record in result:
-                        if record.perm_name == permission:
-                            return True
-
-            return False
+.. literalinclude:: demo/database_auth/db_auth.py
+   :pyobject: DBAuthorizationPolicy.permits
 
 
 Setup
 -----
 
-Once we have all the code in place we can install it for our application::
+Once we have all the code in place we can install it for our application:
 
-    from aiohttp_session.redis_storage import RedisStorage
-    from aiohttp_security import setup as setup_security
-    from aiohttp_security import SessionIdentityPolicy
-    from aiopg.sa import create_engine
-    from aioredis import create_pool
-
-    from .db_auth import DBAuthorizationPolicy
-
-
-    async def init(loop):
-        redis_pool = await create_pool(('localhost', 6379))
-        dbengine = await create_engine(user='aiohttp_security',
-                                       password='aiohttp_security',
-                                       database='aiohttp_security',
-                                       host='127.0.0.1')
-        app = web.Application()
-        setup_session(app, RedisStorage(redis_pool))
-        setup_security(app,
-                       SessionIdentityPolicy(),
-                       DBAuthorizationPolicy(dbengine))
-        return app
-
+.. literalinclude:: demo/database_auth/main.py
+   :pyobject: init_app
 
 Now we have authorization and can decorate every other view with access rights
-based on permissions. There are already implemented two helpers::
+based on permissions. There are two helpers included for this::
 
     from aiohttp_security import check_authorized, check_permission
 
-For each view you need to protect - just apply the decorator on it::
+For each view you need to protect - just apply the decorator on it.
 
-    class Web:
-        async def protected_page(self, request):
-            await check_permission(request, 'protected')
-            response = web.Response(body=b'You are on protected page')
-            return response
+.. literalinclude:: demo/database_auth/handlers.py
+   :pyobject: Web.protected_page
 
-or::
+or
 
-    class Web:
-        async def logout(self, request):
-            await check_authorized(request)
-            response = web.Response(body=b'You have been logged out')
-            await forget(request, response)
-            return response
+.. literalinclude:: demo/database_auth/handlers.py
+   :pyobject: Web.logout
 
-If someone try to access that protected page he will see::
+If someone tries to access that protected page he will see::
 
     403: Forbidden
 
 
-The best part of it - you can implement any logic you want until it
-follows the API conventions.
+The best part of it - you can implement any logic you want following the API conventions.
 
 Launch application
 ------------------
 
 For working with passwords there is a good library passlib_. Once you've
-created some users you want to check their credentials on login. Similar
+created some users you want to check their credentials on login. A similar
 function may do what you are trying to accomplish::
 
     from passlib.hash import sha256_crypt
 
-    async def check_credentials(db_engine, username, password):
-        async with  db_engine as conn:
-            where = sa.and_(db.users.c.login == username,
-                            sa.not_(db.users.c.disabled))
-            query = db.users.select().where(where)
-            ret = await conn.execute(query)
-            user = await ret.fetchone()
-            if user is not None:
-                hash = user[2]
-                return sha256_crypt.verify(password, hash)
-        return False
+.. literalinclude:: demo/database_auth/db_auth.py
+   :pyobject: check_credentials
 
 
 Final step is to launch your application::
 
-    python demo/database_auth/main.py
+    python -m database_auth
 
 
 Try to login with admin/moderator/user accounts (with **password** password)
