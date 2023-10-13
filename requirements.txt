@@ -11,4 +11,4 @@ pytest==7.4.2
 pytest-aiohttp==1.0.5
 pytest-cov==4.1.0
 pytest-mock==3.11.1
-sqlalchemy==2.0.21
+sqlalchemy==2.0.22
