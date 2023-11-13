@@ -5,8 +5,8 @@ from aiohttp import web
 
 from aiohttp_security.abc import AbstractAuthorizationPolicy, AbstractIdentityPolicy
 
-IDENTITY_KEY = web.AppKey('aiohttp_security_identity_policy', AbstractIdentityPolicy)
-AUTZ_KEY = web.AppKey('aiohttp_security_autz_policy', AbstractAuthorizationPolicy)
+IDENTITY_KEY = web.AppKey("aiohttp_security_identity_policy", AbstractIdentityPolicy)
+AUTZ_KEY = web.AppKey("aiohttp_security_autz_policy", AbstractAuthorizationPolicy)
 
 # _AIP/_AAP are shorthand for Optional[policy] when we retrieve from request.
 _AAP = Optional[AbstractAuthorizationPolicy]
