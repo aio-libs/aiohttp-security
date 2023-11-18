@@ -35,7 +35,7 @@ async def test_no_pyjwt_installed(mocker):
         JWTIdentityPolicy('secret')
 
 
-async def test_identify(loop, make_token, aiohttp_client):
+async def test_identify(make_token, aiohttp_client):
     kwt_secret_key = "Key"  # noqa: S105
 
     token = make_token({'login': 'Andrew'}, kwt_secret_key)
@@ -56,7 +56,7 @@ async def test_identify(loop, make_token, aiohttp_client):
     assert 200 == resp.status
 
 
-async def test_identify_broken_scheme(loop, make_token, aiohttp_client):
+async def test_identify_broken_scheme(make_token, aiohttp_client):
     kwt_secret_key = "Key"  # noqa: S105
 
     token = make_token({'login': 'Andrew'}, kwt_secret_key)
