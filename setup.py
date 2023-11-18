@@ -16,7 +16,7 @@ def read(f):
     return open(os.path.join(os.path.dirname(__file__), f)).read().strip()
 
 
-install_requires = ['aiohttp>=3.2.0']
+install_requires = ["aiohttp>=3.9"]
 tests_require = install_requires + ['pytest']
 extras_require = {'session': 'aiohttp-session'}
 
