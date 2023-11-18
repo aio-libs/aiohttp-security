@@ -5,7 +5,7 @@ from .cookies_identity import CookiesIdentityPolicy
 from .jwt_identity import JWTIdentityPolicy
 from .session_identity import SessionIdentityPolicy
 
-__version__ = '0.4.0'
+__version__ = '0.5.0'
 
 
 __all__ = ('AbstractIdentityPolicy', 'AbstractAuthorizationPolicy',
