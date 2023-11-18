@@ -4,6 +4,14 @@ CHANGES
 
 .. towncrier release notes start
 
+0.5.0 (2023-11-18)
+==================
+
+- Added type annotations.
+- Added a reason message when permission is rejected.
+- Switched to ``aiohttp.web.AppKey``.
+- Reverted change in ``JWTIdentityPolicy`` so identity returns ``str``.
+
 0.4.0 (2018-09-27)
 ==================
 
