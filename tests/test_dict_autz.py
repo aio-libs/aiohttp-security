@@ -24,7 +24,7 @@ class Autz(AbstractAuthorizationPolicy):
             return None
 
 
-async def test_authorized_userid(loop, aiohttp_client):
+async def test_authorized_userid(aiohttp_client):
 
     async def login(request):
         response = web.HTTPFound(location='/')
@@ -48,7 +48,7 @@ async def test_authorized_userid(loop, aiohttp_client):
     assert 'Andrew' == txt
 
 
-async def test_authorized_userid_not_authorized(loop, aiohttp_client):
+async def test_authorized_userid_not_authorized(aiohttp_client):
 
     async def check(request):
         userid = await authorized_userid(request)
@@ -64,7 +64,7 @@ async def test_authorized_userid_not_authorized(loop, aiohttp_client):
     assert 200 == resp.status
 
 
-async def test_permits_enum_permission(loop, aiohttp_client):
+async def test_permits_enum_permission(aiohttp_client):
     class Permission(enum.Enum):
         READ = '101'
         WRITE = '102'
@@ -107,7 +107,7 @@ async def test_permits_enum_permission(loop, aiohttp_client):
     assert 200 == resp.status
 
 
-async def test_permits_unauthorized(loop, aiohttp_client):
+async def test_permits_unauthorized(aiohttp_client):
 
     async def check(request):
         ret = await permits(request, 'read')
@@ -126,7 +126,7 @@ async def test_permits_unauthorized(loop, aiohttp_client):
     assert 200 == resp.status
 
 
-async def test_is_anonymous(loop, aiohttp_client):
+async def test_is_anonymous(aiohttp_client):
 
     async def index(request):
         is_anon = await is_anonymous(request)
@@ -162,7 +162,7 @@ async def test_is_anonymous(loop, aiohttp_client):
     assert web.HTTPUnauthorized.status_code == resp.status
 
 
-async def test_check_authorized(loop, aiohttp_client):
+async def test_check_authorized(aiohttp_client):
     async def index(request):
         await check_authorized(request)
         return web.Response()
@@ -195,7 +195,7 @@ async def test_check_authorized(loop, aiohttp_client):
     assert web.HTTPUnauthorized.status_code == resp.status
 
 
-async def test_check_permission(loop, aiohttp_client):
+async def test_check_permission(aiohttp_client):
 
     async def index_read(request):
         await check_permission(request, 'read')
