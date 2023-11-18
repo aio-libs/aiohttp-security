@@ -15,7 +15,7 @@ class Autz(AbstractAuthorizationPolicy):
         pass
 
 
-async def test_remember(loop, aiohttp_client):
+async def test_remember(aiohttp_client):
 
     async def handler(request):
         response = web.Response()
@@ -31,7 +31,7 @@ async def test_remember(loop, aiohttp_client):
     assert 'Andrew' == resp.cookies['AIOHTTP_SECURITY'].value
 
 
-async def test_identify(loop, aiohttp_client):
+async def test_identify(aiohttp_client):
 
     async def create(request):
         response = web.Response()
@@ -56,7 +56,7 @@ async def test_identify(loop, aiohttp_client):
     assert 200 == resp.status
 
 
-async def test_forget(loop, aiohttp_client):
+async def test_forget(aiohttp_client):
 
     async def index(request):
         return web.Response()
