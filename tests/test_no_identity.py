@@ -3,7 +3,7 @@ from aiohttp import web
 from aiohttp_security import forget, remember
 
 
-async def test_remember(loop, aiohttp_client):
+async def test_remember(aiohttp_client):
 
     async def do_remember(request):
         response = web.Response()
@@ -18,7 +18,7 @@ async def test_remember(loop, aiohttp_client):
     assert exp == resp.reason
 
 
-async def test_forget(loop, aiohttp_client):
+async def test_forget(aiohttp_client):
 
     async def do_forget(request):
         response = web.Response()

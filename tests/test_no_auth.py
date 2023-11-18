@@ -3,7 +3,7 @@ from aiohttp import web
 from aiohttp_security import authorized_userid, permits
 
 
-async def test_authorized_userid(loop, aiohttp_client):
+async def test_authorized_userid(aiohttp_client):
 
     async def check(request):
         userid = await authorized_userid(request)
@@ -17,7 +17,7 @@ async def test_authorized_userid(loop, aiohttp_client):
     assert 200 == resp.status
 
 
-async def test_permits(loop, aiohttp_client):
+async def test_permits(aiohttp_client):
 
     async def check(request):
         ret = await permits(request, 'read')
