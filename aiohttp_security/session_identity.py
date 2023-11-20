@@ -30,7 +30,7 @@ class SessionIdentityPolicy(AbstractIdentityPolicy):
         return session.get(self._session_key)
 
     async def remember(self, request: web.Request, response: web.StreamResponse,
-                       identity: str, **kwargs: None) -> None:
+                       identity: str, **kwargs: object) -> None:
         session = await get_session(request)
         session[self._session_key] = identity
 
