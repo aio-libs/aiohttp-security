@@ -7,7 +7,7 @@ cryptography==43.0.0
 hiredis==2.4.0
 passlib==1.7.4
 pyjwt==2.8.0
-pytest==8.2.2
+pytest==8.3.1
 pytest-aiohttp==1.0.5
 pytest-cov==5.0.0
 pytest-mock==3.14.0
