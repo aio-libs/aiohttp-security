@@ -71,7 +71,7 @@ jobs:
         pytest tests --cov-report xml
         python -m coverage xml
     - name: Upload coverage
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       with:
         file: ./coverage.xml
         flags: unit
