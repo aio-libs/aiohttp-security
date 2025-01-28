@@ -1,7 +1,7 @@
 import os
 import re
 
-from setuptools import find_packages, setup
+from setuptools import setup
 
 
 with open(os.path.join(os.path.abspath(os.path.dirname(
