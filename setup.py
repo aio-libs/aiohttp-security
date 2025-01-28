@@ -1,7 +1,7 @@
 import os
 import re
 
-from setuptools import find_packages, setup
+from setuptools import setup
 
 
 with open(os.path.join(os.path.abspath(os.path.dirname(
@@ -31,11 +31,11 @@ setup(name='aiohttp-security',
           'Intended Audience :: Developers',
           'Programming Language :: Python',
           'Programming Language :: Python :: 3',
-          "Programming Language :: Python :: 3.8",
           "Programming Language :: Python :: 3.9",
           "Programming Language :: Python :: 3.10",
           "Programming Language :: Python :: 3.11",
           "Programming Language :: Python :: 3.12",
+          "Programming Language :: Python :: 3.13",
           'Topic :: Internet :: WWW/HTTP',
           'Framework :: AsyncIO',
           "Framework :: aiohttp",
@@ -44,7 +44,8 @@ setup(name='aiohttp-security',
       author_email='andrew.svetlov@gmail.com',
       url='https://github.com/aio-libs/aiohttp_security/',
       license='Apache 2',
-      packages=find_packages(),
+      packages=("aiohttp_security",),
+      python_requires=">=3.9",
       install_requires=install_requires,
       tests_require=tests_require,
       include_package_data=True,
