@@ -17,4 +17,4 @@ submodules:
 build:
   os: ubuntu-24.04
   tools:
-    python: "3.11"
+    python: "3.13"
