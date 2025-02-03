@@ -85,7 +85,7 @@ async def test_identify_broken_scheme(make_token, aiohttp_client):
 async def test_identify_expired_signature(make_token, aiohttp_client):
     kwt_secret_key = "Key"  # noqa: S105
 
-    token = make_token({'login': 'Andrew', 'exp': 0}, kwt_secret_key)
+    token = make_token({"login": "Andrew", "exp": 0}, kwt_secret_key)
 
     async def check(request):
         policy = request.app[IDENTITY_KEY]
@@ -94,14 +94,14 @@ async def test_identify_expired_signature(make_token, aiohttp_client):
         except jwt.exceptions.PyJWTError as exc:
             raise web.HTTPBadRequest(reason=str(exc))
 
-        return web.Response()
+        assert False
 
     app = web.Application()
     _setup(app, JWTIdentityPolicy(kwt_secret_key), Autz())
-    app.router.add_route('GET', '/', check)
+    app.router.add_route("GET", "/", check)
 
     client = await aiohttp_client(app)
     headers = {"Authorization": "Bearer {}".format(token)}
-    resp = await client.get('/', headers=headers)
+    resp = await client.get("/", headers=headers)
     assert 400 == resp.status
-    assert 'Signature has expired' in resp.reason
+    assert "Signature has expired" in resp.reason
