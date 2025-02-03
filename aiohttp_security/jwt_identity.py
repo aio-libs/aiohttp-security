@@ -2,19 +2,20 @@
 
 """
 
-from typing import Optional
+from typing import Optional, Tuple, Type
 
 from aiohttp import web
 
 from .abc import AbstractIdentityPolicy
 
+_bases_error: Tuple[Type[jwt.exceptions.PyJWTError], ...]
 try:
     import jwt
     HAS_JWT = True
-    _bases_error = (jwt.exceptions.PyJWTError, ValueError)
+    _bases_error = (jwt.exceptions.PyJWTError,)
 except ImportError:  # pragma: no cover
     HAS_JWT = False
-    _bases_error = (ValueError, )
+    _bases_error = ()
 
 
 AUTH_HEADER_NAME = 'Authorization'
@@ -23,7 +24,7 @@ AUTH_SCHEME = 'Bearer '
 
 # This class inherits from ValueError to maintain backward compatibility
 # with previous versions of aiohttp-security
-class InvalidAuthorizationScheme(*_bases_error):
+class InvalidAuthorizationScheme(ValueError, *_bases_error):  # type: ignore[misc]
     pass
 
 
