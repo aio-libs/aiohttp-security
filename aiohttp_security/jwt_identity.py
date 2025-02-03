@@ -25,7 +25,7 @@ AUTH_SCHEME = 'Bearer '
 # This class inherits from ValueError to maintain backward compatibility
 # with previous versions of aiohttp-security
 class InvalidAuthorizationScheme(ValueError, *_bases_error):  # type: ignore[misc]
-    pass
+    """Exception when the auth method can't be read from header."""
 
 
 class JWTIdentityPolicy(AbstractIdentityPolicy):
