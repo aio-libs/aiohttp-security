@@ -1,14 +1,14 @@
 -e .
-aiohttp==3.10.10
+aiohttp==3.11.11
 aiohttp-session==2.12.1
-async-timeout==4.0.3
-coverage==7.6.1
-cryptography==43.0.3
+async-timeout==5.0.1
+coverage==7.6.10
+cryptography==44.0.0
 hiredis==3.1.0
 passlib==1.7.4
-pyjwt==2.9.0
+pyjwt==2.10.1
 pytest==8.3.4
-pytest-aiohttp==1.0.5
-pytest-cov==5.0.0
+pytest-aiohttp==1.1.0
+pytest-cov==6.0.0
 pytest-mock==3.14.0
 sqlalchemy==2.0.37
