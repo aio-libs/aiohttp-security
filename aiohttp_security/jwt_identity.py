@@ -8,10 +8,10 @@ from aiohttp import web
 
 from .abc import AbstractIdentityPolicy
 
-_bases_error: Tuple[Type[jwt.exceptions.PyJWTError], ...]
 try:
     import jwt
     HAS_JWT = True
+    _bases_error: Tuple[Type[jwt.exceptions.PyJWTError], ...]
     _bases_error = (jwt.exceptions.PyJWTError,)
 except ImportError:  # pragma: no cover
     HAS_JWT = False
