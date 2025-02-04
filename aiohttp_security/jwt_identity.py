@@ -2,7 +2,7 @@
 
 """
 
-from typing import Optional
+from typing import Optional, Tuple, Type
 
 from aiohttp import web
 
@@ -11,12 +11,21 @@ from .abc import AbstractIdentityPolicy
 try:
     import jwt
     HAS_JWT = True
+    _bases_error: Tuple[Type[jwt.exceptions.PyJWTError], ...]
+    _bases_error = (jwt.exceptions.PyJWTError,)
 except ImportError:  # pragma: no cover
     HAS_JWT = False
+    _bases_error = ()
 
 
 AUTH_HEADER_NAME = 'Authorization'
 AUTH_SCHEME = 'Bearer '
+
+
+# This class inherits from ValueError to maintain backward compatibility
+# with previous versions of aiohttp-security
+class InvalidAuthorizationScheme(ValueError, *_bases_error):  # type: ignore[misc]
+    """Exception when the auth method can't be read from header."""
 
 
 class JWTIdentityPolicy(AbstractIdentityPolicy):
@@ -34,8 +43,8 @@ class JWTIdentityPolicy(AbstractIdentityPolicy):
             return None
 
         if not header_identity.startswith(AUTH_SCHEME):
-            raise ValueError("Invalid authorization scheme. "
-                             + "Should be `{}<token>`".format(AUTH_SCHEME))
+            raise InvalidAuthorizationScheme("Invalid authorization scheme. "
+                                             "Should be `{}<token>`".format(AUTH_SCHEME))
 
         token = header_identity.split(' ')[1].strip()
 

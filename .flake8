@@ -10,8 +10,9 @@ select = A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,B901,B902,B903,B950
 # W503: Mutually exclusive with W504.
 ignore = E226,E501,E722,W503
 per-file-ignores =
+    # B011: assert False used for coverage skipping
     # S101: Pytest uses assert
-    tests/*:S101
+    tests/*:B011,S101
 
 # flake8-import-order
 application-import-names = aiohttp_security
