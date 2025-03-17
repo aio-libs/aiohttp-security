@@ -2,7 +2,7 @@
 aiohttp==3.11.13
 aiohttp-session==2.12.1
 async-timeout==5.0.1
-coverage==7.6.12
+coverage==7.7.0
 cryptography==44.0.2
 hiredis==3.1.0
 passlib==1.7.4
