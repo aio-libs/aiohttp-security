@@ -1,5 +1,5 @@
 -e .
-aiohttp==3.11.14
+aiohttp==3.11.15
 aiohttp-session==2.12.1
 async-timeout==5.0.1
 coverage==7.8.0
