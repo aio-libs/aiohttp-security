@@ -3,7 +3,7 @@ aiohttp==3.12.13
 aiohttp-session==2.12.1
 async-timeout==5.0.1
 coverage==7.9.2
-cryptography==45.0.4
+cryptography==45.0.5
 hiredis==3.2.1
 passlib==1.7.4
 pyjwt==2.10.1
