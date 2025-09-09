@@ -9,6 +9,6 @@ passlib==1.7.4
 pyjwt==2.10.1
 pytest==8.4.2
 pytest-aiohttp==1.1.0
-pytest-cov==6.3.0
+pytest-cov==7.0.0
 pytest-mock==3.15.0
 sqlalchemy==2.0.43
