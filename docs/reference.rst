@@ -86,6 +86,8 @@ Public API functions
 
    :param request:  :class:`aiohttp.web.Request` object.
 
+   :return str: authorized user ID if success
+
    :raise: :class:`aiohttp.web.HTTPUnauthorized` for anonymous users.
 
    :raise: :class:`aiohttp.web.HTTPForbidden` if user is

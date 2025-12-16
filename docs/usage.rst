@@ -64,8 +64,10 @@ The workflow is as follows:
    :func:`authorized_userid` *be invoked* .
 4) If the user tries to access a restricted asset the :func:`permits`
    method is called.  Usually assets are protected using the
-   :func:`check_permission` helper.  This should return True if
-   permission is granted.
+   :func:`check_permission` helper, which raises
+   :class:`aiohttp.web.HTTPUnauthorized` or
+   :class:`aiohttp.web.HTTPForbidden` on failure, and returns the
+   :term:`userid` on success.
 
 The :func:`permits` method is implemented by the developer as part of
 the :class:`AbstractAuthorizationPolicy` and passed to the
