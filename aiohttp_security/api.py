@@ -103,7 +103,7 @@ async def check_authorized(request: web.Request) -> str:
 
 
 async def check_permission(request: web.Request, permission: Union[str, enum.Enum],
-                           context: Any = None) -> None:
+                           context: Any = None) -> str:
     """Checker that passes only to authoraised users with given permission.
 
     If user is not authorized - raises HTTPUnauthorized,
@@ -111,10 +111,11 @@ async def check_permission(request: web.Request, permission: Union[str, enum.Enu
     raises HTTPForbidden.
     """
 
-    await check_authorized(request)
+    userid = await check_authorized(request)
     allowed = await permits(request, permission, context)
     if not allowed:
         raise web.HTTPForbidden(reason="User does not have '{}' permission".format(permission))
+    return userid
 
 
 def setup(app: web.Application, identity_policy: AbstractIdentityPolicy,
