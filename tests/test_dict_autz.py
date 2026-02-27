@@ -198,8 +198,8 @@ async def test_check_authorized(aiohttp_client):
 async def test_check_permission(aiohttp_client):
 
     async def index_read(request):
-        await check_permission(request, 'read')
-        return web.Response()
+        userid = await check_permission(request, 'read')
+        return web.Response(text=userid)
 
     async def index_write(request):
         await check_permission(request, 'write')
@@ -238,6 +238,7 @@ async def test_check_permission(aiohttp_client):
     await client.post('/login')
     resp = await client.get('/permission/read')
     assert web.HTTPOk.status_code == resp.status
+    assert "Andrew" == await resp.text()
     resp = await client.get('/permission/write')
     assert web.HTTPOk.status_code == resp.status
     resp = await client.get('/permission/forbid')
