@@ -64,7 +64,6 @@ async def authorized_userid(request: web.Request) -> Optional[str]:
     return user_id
 
 
-
 def _validate_permission(permission: Union[str, enum.Enum]) -> None:
     if not permission or not isinstance(permission, (str, enum.Enum)):
         raise ValueError("Permission should be a str or enum value.")
