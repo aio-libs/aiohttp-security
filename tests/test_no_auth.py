@@ -1,5 +1,5 @@
-from aiohttp import web
 import pytest
+from aiohttp import web
 
 from aiohttp_security import authorized_userid, check_permission, permits
 
