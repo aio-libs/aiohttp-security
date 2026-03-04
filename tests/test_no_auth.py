@@ -40,7 +40,7 @@ async def test_check_permission_rejects_invalid_value(aiohttp_client):
 
     async def check(request):
         with pytest.raises(ValueError):
-            await check_permission(request, None)
+            await check_permission(request, None)  # type: ignore[arg-type]
         return web.Response()
 
     app = web.Application()
