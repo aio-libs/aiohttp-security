@@ -3,10 +3,10 @@ aiohttp==3.13.5
 aiohttp-session==2.12.1
 async-timeout==5.0.1
 coverage==7.10.7
-cryptography==46.0.7
+cryptography==48.0.1
 hiredis==3.4.0
 passlib==1.7.4
-pyjwt==2.10.1
+pyjwt==2.13.0
 pytest==8.4.2
 pytest-aiohttp==1.1.0
 pytest-cov==7.1.0
