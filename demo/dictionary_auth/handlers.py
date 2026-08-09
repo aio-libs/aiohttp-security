@@ -52,6 +52,7 @@ async def login(request: web.Request) -> NoReturn:
     verified = await check_credentials(user_map, username, password)
     if verified:
         response = web.HTTPFound("/")
+        await forget(request, response)
         await remember(request, response, username)
         raise response
 

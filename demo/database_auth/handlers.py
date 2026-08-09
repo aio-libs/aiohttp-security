@@ -45,6 +45,7 @@ class Web:
 
         if await check_credentials(request.app["db_session"], login, password):
             response = web.HTTPFound("/")
+            await forget(request, response)
             await remember(request, response, login)
             raise response
 
