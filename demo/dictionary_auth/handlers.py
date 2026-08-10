@@ -5,6 +5,7 @@ from aiohttp import web
 
 from aiohttp_security import (authorized_userid, check_authorized, check_permission, forget,
                               remember)
+from aiohttp_session import get_session
 from .authz import check_credentials
 from .users import User
 
@@ -52,7 +53,8 @@ async def login(request: web.Request) -> NoReturn:
     verified = await check_credentials(user_map, username, password)
     if verified:
         response = web.HTTPFound("/")
-        await forget(request, response)
+        session = await get_session(request)
+        session.invalidate()
         await remember(request, response, username)
         raise response
 

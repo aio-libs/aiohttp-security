@@ -5,6 +5,7 @@ from aiohttp import web
 
 from aiohttp_security import (authorized_userid, check_authorized, check_permission, forget,
                               remember)
+from aiohttp_session import get_session
 from .db_auth import check_credentials
 
 
@@ -45,7 +46,8 @@ class Web:
 
         if await check_credentials(request.app["db_session"], login, password):
             response = web.HTTPFound("/")
-            await forget(request, response)
+            session = await get_session(request)
+            session.invalidate()
             await remember(request, response, login)
             raise response
 
