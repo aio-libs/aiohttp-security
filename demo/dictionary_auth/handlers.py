@@ -2,10 +2,10 @@ from textwrap import dedent
 from typing import Dict, NoReturn, Optional
 
 from aiohttp import web
+from aiohttp_session import get_session
 
 from aiohttp_security import (authorized_userid, check_authorized, check_permission, forget,
                               remember)
-from aiohttp_session import get_session
 from .authz import check_credentials
 from .users import User
 
