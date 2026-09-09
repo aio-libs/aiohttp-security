@@ -2,7 +2,7 @@ from textwrap import dedent
 from typing import Dict, NoReturn, Optional
 
 from aiohttp import web
-from aiohttp_session import get_session
+from aiohttp_session import new_session
 
 from aiohttp_security import (authorized_userid, check_authorized, check_permission, forget,
                               remember)
@@ -53,8 +53,7 @@ async def login(request: web.Request) -> NoReturn:
     verified = await check_credentials(user_map, username, password)
     if verified:
         response = web.HTTPFound("/")
-        session = await get_session(request)
-        session.invalidate()
+        await new_session(request)
         await remember(request, response, username)
         raise response
 
