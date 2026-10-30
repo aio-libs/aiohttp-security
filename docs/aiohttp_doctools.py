@@ -1,24 +1,19 @@
+from docutils import nodes
 from sphinx import addnodes
-from sphinx.domains.python import PyClassmember, PyModulelevel
+from sphinx.domains.python import PyFunction, PyMethod
 
 
-class PyCoroutineMixin(object):
-    def handle_signature(self, sig, signode):
-        ret = super(PyCoroutineMixin, self).handle_signature(sig, signode)
-        signode.insert(0, addnodes.desc_annotation('coroutine ', 'coroutine '))
-        return ret
+class PyCoroutineMixin:
+    def get_signature_prefix(self, sig):
+        return [nodes.Text('coroutine'), addnodes.desc_sig_space()]
 
 
-class PyCoroutineFunction(PyCoroutineMixin, PyModulelevel):
-    def run(self):
-        self.name = 'py:function'
-        return PyModulelevel.run(self)
+class PyCoroutineFunction(PyCoroutineMixin, PyFunction):
+    pass
 
 
-class PyCoroutineMethod(PyCoroutineMixin, PyClassmember):
-    def run(self):
-        self.name = 'py:method'
-        return PyClassmember.run(self)
+class PyCoroutineMethod(PyCoroutineMixin, PyMethod):
+    pass
 
 
 def setup(app):

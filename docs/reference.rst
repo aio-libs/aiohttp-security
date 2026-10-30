@@ -19,7 +19,7 @@ Public API functions
 
    :param app: aiohttp :class:`aiohttp.web.Application` instance.
 
-   :param identity_policy: indentification policy, an
+   :param identity_policy: identification policy, an
                            :class:`AbstractIdentityPolicy` instance.
 
    :param autz_policy: authorization policy, an
@@ -42,7 +42,8 @@ Public API functions
    :param response: :class:`aiohttp.web.StreamResponse` and
                     descendants like :class:`aiohttp.web.Response`.
 
-   :param str identity: :class:`aiohttp.web.Request` object.
+   :param str identity: :term:`identity` to remember in the response. It is
+                        later recovered by :meth:`AbstractIdentityPolicy.identify`.
 
    :param kwargs: additional arguments passed to
                   :meth:`AbstractIdentityPolicy.remember`.
@@ -80,11 +81,17 @@ Public API functions
           # this line is never executed for anonymous users
 
 
-.. coroutinefunction:: check_permission(request, permission)
+.. coroutinefunction:: check_permission(request, permission, context=None)
 
    Checker that doesn't pass if user has no requested permission.
 
    :param request:  :class:`aiohttp.web.Request` object.
+
+   :param permission: requested :term:`permission`. :class:`str` or
+                      :class:`enum.Enum` object.
+
+   :param context: additional object passed into
+                   :meth:`AbstractAuthorizationPolicy.permits`.
 
    :raise: :class:`aiohttp.web.HTTPUnauthorized` for anonymous users.
 
@@ -130,7 +137,7 @@ Public API functions
                       :class:`enum.Enum` object.
 
    :param context: additional object may be passed into
-                   :meth:`AbstractAuthorizationPolicy.permission`
+                   :meth:`AbstractAuthorizationPolicy.permits`
                    coroutine.
 
    :return: ``True`` if registered user has requested *permission*,

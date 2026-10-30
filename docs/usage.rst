@@ -46,11 +46,11 @@ There are  abstract base  classes for  both types  as well  as several
 pre-built implementations that are  shipped with the library. However,
 the end user is free to build their own implementations.
 
-The library comes with two pre-built identity policies; one that uses
-cookies, and one that uses sessions [#f1]_.  It is envisioned that in
-most use cases developers will use one of the provided identity
-policies (Cookie or Session) and implement their own authorization
-policy.
+The library comes with three pre-built identity policies; one that uses
+cookies, one that uses sessions and one that uses JSON Web Tokens.  It
+is envisioned that in most use cases developers will use one of the
+provided identity policies (Cookie, Session or JWT) and implement their
+own authorization policy.
 
 The workflow is as follows:
 
@@ -58,8 +58,8 @@ The workflow is as follows:
 2) Once user is authenticated an identity string has to be created for
    that user.  This has to be implemented by the developer.
 3) The identity string is passed to the Identity Policy's remember
-   method and the user is now remembered (Cookie or Session if using
-   built-in).  *Only once a user is remembered can the other API
+   method and the user is now remembered (Cookie, Session or JWT if
+   using built-in).  *Only once a user is remembered can the other API
    methods:* :func:`permits`, :func:`forget`, *and*
    :func:`authorized_userid` *be invoked* .
 4) If the user tries to access a restricted asset the :func:`permits`
@@ -86,13 +86,13 @@ Authentication is the process where a user's identity is verified. It
 confirms who the user is. This is traditionally done using a user name
 and password (note: this is not the only way).
 
-A authenticated user has no access rights, rather an authenticated
+An authenticated user has no access rights, rather an authenticated
 user merely confirms that the user exists and that the user is who
 they say they are.
 
 In *aiohttp_security* the developer is responsible for their own
 authentication mechanism.  *aiohttp_security* only requires that the
-authentication result in a identity string which corresponds to a
+authentication result in an identity string which corresponds to a
 user's id in the underlying system.
 
 .. note::
@@ -107,15 +107,16 @@ Identity Policy
 
 Once a user is authenticated the *aiohttp_security* API is invoked for
 storing, retrieving, and removing a user's :term:`identity`.  This is
-accommplished via AbstractIdentityPolicy's :func:`remember`,
+accomplished via AbstractIdentityPolicy's :func:`remember`,
 :func:`identify`, and :func:`forget` methods.  The Identity Policy is
-therefore the mechanism by which a authenticated user is persisted in
+therefore the mechanism by which an authenticated user is persisted in
 the system.
 
-*aiohttp_security* has two built in identity policy's for this
-purpose.  :class:`CookiesIdentityPolicy` that uses cookies and
-:class:`SessionIdentityPolicy` that uses sessions via
-``aiohttp-session`` library.
+*aiohttp_security* has three built-in identity policies for this
+purpose: :class:`CookiesIdentityPolicy` that uses cookies,
+:class:`SessionIdentityPolicy` that uses sessions via the
+``aiohttp-session`` library and :class:`JWTIdentityPolicy` that uses
+JSON Web Tokens.
 
 Authorization
 ==============
@@ -136,7 +137,3 @@ As noted above, :term:`identity` is a string that is shared between
 the browser and the server.  Therefore it is recommended that a
 random string such as a uuid or hash is used rather than things like
 a database primary key, user login/email, etc.
-
-
-.. rubric:: Footnotes
-.. [#f1] jwt - json web tokens in the works

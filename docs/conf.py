@@ -53,6 +53,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.viewcode',
     'alabaster',
+    'aiohttp_doctools',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -88,7 +89,7 @@ release = '{major}.{minor}.{patch}-{tag}'.format(**_version_info)
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
@@ -139,13 +140,12 @@ html_theme = 'alabaster'
 # documentation.
 html_theme_options = {
     'logo': 'aiohttp-icon-128x128.png',
-    'description': 'Authorization and identity for aoihttp',
+    'description': 'Authorization and identity for aiohttp',
     'github_user': 'aio-libs',
     'github_repo': 'aiohttp-security',
     'github_button': True,
     'github_type': 'star',
     'github_banner': True,
-    'travis_button': True,
     'codecov_button': True,
     'pre_bg': '#FFF6E5',
     'note_bg': '#E5ECD1',
