@@ -2,6 +2,7 @@ from textwrap import dedent
 from typing import NoReturn
 
 from aiohttp import web
+from aiohttp_session import new_session
 
 from aiohttp_security import (authorized_userid, check_authorized, check_permission, forget,
                               remember)
@@ -45,6 +46,7 @@ class Web:
 
         if await check_credentials(request.app["db_session"], login, password):
             response = web.HTTPFound("/")
+            await new_session(request)
             await remember(request, response, login)
             raise response
 
